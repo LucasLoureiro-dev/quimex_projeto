@@ -1,2 +1,1 @@
-# VendeTudoS.A
-TCC para o SENAI
+chapei pra krl n deleta
