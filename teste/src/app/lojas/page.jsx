@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 export default function Lojas() {
   const [lojas, setLojas] = useState([]);
   const [editar, setEditar] = useState(false);
+  const [visualizar, setVisualizar] = useState(false); // New state for view modal
   const [formData, setFormData] = useState({
     nome: "",
     localizacao: "",
@@ -13,7 +14,15 @@ export default function Lojas() {
     horario_abertura: "",
     horario_fechamento: "",
   });
-  const [editando, setEditando] = useState("");
+  const [snapshot, setSnapshot] = useState({
+    nome: "",
+    localizacao: "",
+    cep: "",
+    contato: "",
+    horario_abertura: "",
+    horario_fechamento: "",
+  });
+  const [lojaSelecionada, setLojaSelecionada] = useState(null); // New state to hold selected loja for viewing
 
   useEffect(() => {
     fetch(`http://localhost:8080/lojas`, {
@@ -24,7 +33,8 @@ export default function Lojas() {
         if (res.ok) {
           return res.json();
         } else {
-          if (response.status === 404) {
+          if (res.status === 404) {
+            // Changed 'response.status' to 'res.status'
             return [];
           } else {
             throw new Error("Erro ao buscar chamadas das lojas");
@@ -37,7 +47,16 @@ export default function Lojas() {
   }, []);
 
   const editarLoja = (loja) => {
-    setEditar(true)
+    setEditar(true);
+    setSnapshot({
+      id: loja.id,
+      nome: loja.nome,
+      localizacao: loja.localização,
+      cep: loja.cep,
+      contato: loja.contato,
+      horario_abertura: loja.horario_abertura,
+      horario_fechamento: loja.horario_fenchamento,
+    });
     setFormData({
       id: loja.id,
       nome: loja.nome,
@@ -49,6 +68,11 @@ export default function Lojas() {
     });
   };
 
+  const visualizarLoja = (loja) => {
+    setLojaSelecionada(loja);
+    setVisualizar(true);
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
@@ -57,30 +81,94 @@ export default function Lojas() {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    fetch(`http://localhost:8080/lojas/${formData.id}`, {
-      method: "put",
-      credentials: "include",
-      headers: {
-        "content-type": "application/json",
-      },
-      body: JSON.stringify(formData),
-    })
-      .then((res) => {
-        if (res.ok) {
-          return res.json();
-        } else {
-          if (res.status === 500) {
-            return [];
-          } else {
-            throw new Error("Erro ao atualizar loja");
-          }
-        }
+
+    const res = await fetch(`http://localhost:8080/lojas`);
+
+    const data = await res.json();
+
+    const conflito =
+      formData.nome == snapshot.nome
+        ? formData.cep == snapshot.cep
+          ? false
+          : data.lojas.find((loja) => loja.cep == formData.cep)
+        : formData.cep == snapshot.cep
+        ? data.lojas.find((loja) => loja.nome == formData.nome)
+        : data.lojas.find((loja) => loja.nome == formData.nome) ||
+          data.lojas.find((loja) => loja.cep == formData.cep);
+
+    const start = `${formData.horario_abertura}`;
+    const end = `${formData.horario_fechamento}`;
+
+    const [startH, startM] = start.split(":").map(Number);
+    const [endH, endM] = end.split(":").map(Number);
+
+    const startTotalMinutes = startH * 60 + startM;
+    const endTotalMinutes = endH * 60 + endM;
+
+    const diffMinutes = endTotalMinutes - startTotalMinutes;
+    const hours = Math.floor(diffMinutes / 60);
+    const minutes = diffMinutes % 60;
+
+    if (JSON.stringify(snapshot) == JSON.stringify(formData)) {
+      alert("Não houve alterações.");
+      return;
+    } else if (conflito) {
+      alert(
+        "Oops, nome/localização estão entrando em conflito com outra loja, verifique os dados e tente novamente."
+      );
+      return;
+    } else if (hours < 8) {
+      alert(
+        "A loja deve estar aberta pelo menos 8 horas por dia."
+      );
+      return;
+    } else {
+      fetch(`http://localhost:8080/lojas/${formData.id}`, {
+        method: "put",
+        credentials: "include",
+        headers: {
+          "content-type": "application/json",
+        },
+        body: JSON.stringify(formData),
       })
-      .then((data) => {
-        window.location.href = "/lojas";
-      });
+        .then((res) => {
+          if (res.ok) {
+            return res.json();
+          } else {
+            if (res.status === 500) {
+              return [];
+            } else {
+              throw new Error("Erro ao atualizar loja");
+            }
+          }
+        })
+        .then((data) => {
+          setSnapshot([]);
+          window.location.href = "/lojas";
+        });
+    }
+  };
+
+  const handleDelete = async (id) => {
+    const res = await fetch(`http://localhost:8080/lojas/${id}`, {
+      method: "delete",
+      credentials: "include",
+    });
+
+    if (!res.ok) {
+      if (res.status === 400) {
+        alert(
+          "Não é possível excluir esta loja pois há registros vinculadas à ela."
+        );
+        return;
+      } else {
+        throw new Error("Erro ao deletar loja");
+      }
+    } else {
+      setLojas(lojas.filter((loja) => loja.id !== id));
+    }
   };
 
   return (
@@ -93,10 +181,11 @@ export default function Lojas() {
               Localização
             </th>
             <th style={{ border: "1px solid black", padding: "8px" }}>CEP</th>
+            <th style={{ border: "1px solid black", padding: "8px" }}>Ações</th>
           </tr>
         </thead>
         <tbody>
-          {lojas ? (
+          {lojas && lojas.length > 0 ? (
             <>
               {lojas.map((loja, index) => {
                 return (
@@ -112,6 +201,31 @@ export default function Lojas() {
                     </td>
                     <td className="border border-black px-4 py-2">
                       <div className="flex space-x-2">
+                        {/* View Icon */}
+                        <button
+                          className="text-gray-500 hover:text-gray-700"
+                          onClick={() => visualizarLoja(loja)}
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            strokeWidth={1.5}
+                            stroke="currentColor"
+                            className="w-5 h-5"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"
+                            />
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                            />
+                          </svg>
+                        </button>
                         {/* Edit Icon */}
                         <button
                           className="text-blue-500 hover:text-blue-700"
@@ -129,9 +243,7 @@ export default function Lojas() {
                         {/* Delete Icon */}
                         <button
                           className="text-red-500 hover:text-red-700"
-                          onClick={() =>
-                            console.log("Delete clicked for", loja.nome)
-                          }
+                          onClick={() => handleDelete(loja.id)}
                         >
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -182,10 +294,7 @@ export default function Lojas() {
               </button>
 
               {/* Your Form Content */}
-              <form
-                onSubmit={handleSubmit}
-                className="bg-white" // Remove bg-white and shadow-md as they are on the modal container
-              >
+              <form onSubmit={handleSubmit} className="bg-white">
                 <h2 className="text-2xl font-bold mb-6 text-gray-800">
                   Detalhes do Estabelecimento
                 </h2>
@@ -312,7 +421,7 @@ export default function Lojas() {
                   </button>
                   {/* You might want a cancel button here as well */}
                   <button
-                    type="button" // Important: type="button" to prevent form submission
+                    type="button"
                     onClick={() => setEditar(false)}
                     className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
                   >
@@ -320,6 +429,66 @@ export default function Lojas() {
                   </button>
                 </div>
               </form>
+            </div>
+          </div>
+        </>
+      ) : (
+        <></>
+      )}
+
+      {visualizar && lojaSelecionada ? (
+        <>
+          <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white p-8 rounded-lg shadow-xl relative w-full max-w-lg mx-auto">
+              <button
+                onClick={() => setVisualizar(false)}
+                className="absolute top-4 right-4 text-gray-500 hover:text-gray-800 text-2xl font-bold"
+              >
+                &times;
+              </button>
+              <h2 className="text-2xl font-bold mb-6 text-gray-800">
+                Detalhes da Loja
+              </h2>
+              <div className="mb-4">
+                <p className="block text-gray-700 text-sm font-bold mb-2">
+                  Nome:{" "}
+                  <span className="font-normal">{lojaSelecionada.nome}</span>
+                </p>
+                <p className="block text-gray-700 text-sm font-bold mb-2">
+                  Localização:{" "}
+                  <span className="font-normal">
+                    {lojaSelecionada.localização}
+                  </span>
+                </p>
+                <p className="block text-gray-700 text-sm font-bold mb-2">
+                  CEP:{" "}
+                  <span className="font-normal">{lojaSelecionada.cep}</span>
+                </p>
+                <p className="block text-gray-700 text-sm font-bold mb-2">
+                  Contato:{" "}
+                  <span className="font-normal">{lojaSelecionada.contato}</span>
+                </p>
+                <p className="block text-gray-700 text-sm font-bold mb-2">
+                  Horário de Abertura:{" "}
+                  <span className="font-normal">
+                    {lojaSelecionada.horario_abertura}
+                  </span>
+                </p>
+                <p className="block text-gray-700 text-sm font-bold mb-2">
+                  Horário de Fechamento:{" "}
+                  <span className="font-normal">
+                    {lojaSelecionada.horario_fenchamento}
+                  </span>
+                </p>
+              </div>
+              <div className="flex justify-end">
+                <button
+                  onClick={() => setVisualizar(false)}
+                  className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                >
+                  Fechar
+                </button>
+              </div>
             </div>
           </div>
         </>

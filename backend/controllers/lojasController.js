@@ -78,13 +78,16 @@ const atualizar_lojaController = async (req, res) => {
 const excluir_lojaController = async (req, res) => {
   try {
     const id = req.params.id;
-    const excluir_produto = await excluir_loja(id);
-    res.status(200).json({ controle_diario });
+    const excluido = await excluir_loja(id);
+    if(excluido === 'ER_ROW_IS_REFERENCED_2') {
+      return res.status(400).json({ message: "Não é possível excluir esta loja pois ela está vinculada a outros registros." });
+    }
+    res.status(200).json({ excluido });
   } catch (err) {
-    console.error("Erro excluindo produto químico:", err);
+    console.error("Erro excluindo loja:", err);
     res
       .status(500)
-      .json({ message: "Erro ao excluir produto químico", error: err.message });
+      .json({ message: "Erro ao excluir loja", error: err.message });
   }
 };
 

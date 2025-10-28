@@ -9,7 +9,7 @@ export default async function generateHashedPassword(password) {
     // Hashear a senha com o salt
     const hashedPassword = await bcrypt.hash(user_password, salt);
 
-    console.log('Senha Hasheada:', hashedPassword);
+    // console.log('Senha Hasheada:', hashedPassword);
     return hashedPassword;
   } catch (error) {
     console.error('Erro ao hashear a senha:', error);

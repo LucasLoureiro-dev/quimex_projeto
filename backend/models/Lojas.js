@@ -31,6 +31,9 @@ const excluir_loja = async (id) => {
   try {
     return await deleteRecord("lojas", `id = '${id}'`);
   } catch (err) {
+    if(err.code === 'ER_ROW_IS_REFERENCED_2') {
+      return err.code;
+    }
     console.log(`Houve um erro ao excluir a loja: ${err}`);
     throw new Error("Falha ao excluir a loja");
   }

@@ -20,30 +20,64 @@ export default function Lojas() {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    fetch(`http://localhost:8080/lojas`, {
-      method: "post",
-      credentials: "include",
-      headers: {
-          "content-type": "application/json"
+
+    const res = await fetch(`http://localhost:8080/lojas`);
+
+    const data = await res.json();
+
+    const conflito =
+      data.lojas.find((loja) => loja.nome == formData.nome) ||
+      data.lojas.find((loja) => loja.cep == formData.cep);
+
+    const start = `${formData.horario_abertura}`;
+    const end = `${formData.horario_fechamento}`;
+
+    const [startH, startM] = start.split(":").map(Number);
+    const [endH, endM] = end.split(":").map(Number);
+
+    const startTotalMinutes = startH * 60 + startM;
+    const endTotalMinutes = endH * 60 + endM;
+
+    const diffMinutes = endTotalMinutes - startTotalMinutes;
+    const hours = Math.floor(diffMinutes / 60);
+    const minutes = diffMinutes % 60;
+
+    if (conflito) {
+      alert(
+        "Oops, nome/localização estão entrando em conflito com outra loja, verifique os dados e tente novamente."
+      );
+      return;
+    } else if (hours < 8) {
+      alert(
+        "A loja deve estar aberta pelo menos 8 horas por dia."
+      );
+      return;
+    } else {
+      fetch(`http://localhost:8080/lojas`, {
+        method: "post",
+        credentials: "include",
+        headers: {
+          "content-type": "application/json",
         },
-      body: JSON.stringify(formData)
-    })
-      .then((res) => {
-        if (res.ok) {
-          return res.json();
-        } else {
-          if (res.status === 500) {
-            return [];
-          } else {
-            throw new Error("Erro ao cadastrar loja");
-          }
-        }
+        body: JSON.stringify(formData),
       })
-      .then((data) => {
-        window.location.href = "/lojas"
-      });
+        .then((res) => {
+          if (res.ok) {
+            return res.json();
+          } else {
+            if (res.status === 500) {
+              return [];
+            } else {
+              throw new Error("Erro ao cadastrar loja");
+            }
+          }
+        })
+        .then((data) => {
+          window.location.href = "/lojas";
+        });
+    }
   };
   return (
     <div className="flex justify-center my-auto">
