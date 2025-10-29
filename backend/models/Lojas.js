@@ -22,7 +22,7 @@ const atualizar_loja = async (id, data) => {
   try {
     return await update("lojas", data, `id = '${id}'`);
   } catch (err) {
-    console.log(`Houve um erro ao atualizar a lojaa: ${err}`);
+    console.log(`Houve um erro ao atualizar a loja: ${err}`);
     throw new Error("Falha ao atualizar a loja");
   }
 };

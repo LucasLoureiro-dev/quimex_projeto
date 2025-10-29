@@ -11,12 +11,14 @@ const authMiddleware = async (req, res, next) => {
     const usuario = await listaUsuarios.find(
       (i) => i.id == req.session.usuario
     );
-    if (usuario.cargo != "Administrador" || usuario.cargo != "Gerente") {
+    if (usuario.cargo != "Administrador" && usuario.cargo != "Gerente") {
       return res
         .status(403)
         .json({ mensagem: "Proibido: Acesso restrito a administradores" });
     }
-    next();
+    else{
+          next();
+    }
   } catch (err) {
     return res.status(401).json({ mensagem: "Não autorizado: Token inválido" });
   }

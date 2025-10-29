@@ -79,7 +79,7 @@ const excluir_lojaController = async (req, res) => {
   try {
     const id = req.params.id;
     const excluido = await excluir_loja(id);
-    if(excluido === 'ER_ROW_IS_REFERENCED_2') {
+    if (excluido === 'ER_ROW_IS_REFERENCED_2') {
       return res.status(400).json({ message: "Não é possível excluir esta loja pois ela está vinculada a outros registros." });
     }
     res.status(200).json({ excluido });

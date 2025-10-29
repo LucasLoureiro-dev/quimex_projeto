@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { io } from "socket.io-client";
 
 export default function Cadastrar() {
@@ -15,6 +15,20 @@ export default function Cadastrar() {
     vinculo: "",
     loja_vinculada: "",
   });
+  const [lojas, setLojas] = useState([]);
+
+
+  useEffect(() => {
+    fetch('http://localhost:8080/lojas', {
+      credentials: "include"
+    })
+      .then((res) => {
+        return res.json()
+      })
+      .then((data) => {
+        setLojas(data.lojas);
+      })
+  }, []);
 
   const handleCadastro = async (e) => {
     e.preventDefault();
@@ -118,21 +132,43 @@ export default function Cadastrar() {
           required
         />
         <label htmlFor="">vinculo</label>
-        <input
-          type="text"
-          onChange={handleChange}
+        <select onChange={handleChange}
           name="vinculo"
           value={form.vinculo}
-          required
-        />
-        <label htmlFor="">Loja vinculada</label>
-        <input
-          type="text"
-          onChange={handleChange}
+          required>
+          <option value="" disabled>Selecione a Loja</option>
+          <option value={"Matriz"} >Matriz</option>
+          <option value={"Filial"}>Filial</option>
+        </select>
+        <label htmlFor="car-name">Loja vinculada</label>
+        <select onChange={handleChange}
           name="loja_vinculada"
           value={form.loja_vinculada}
-          required
-        />
+          required>
+          <option value="" disabled>Selecione a Loja</option>
+          {lojas
+            ? (<>
+              {lojas.map((loja, index) => {
+                if (form.vinculo == "Matriz") {
+                  if (loja.id == 1) {
+                    return (
+                      <option key={index} value={loja.id}>{loja.nome}, {loja.localização}</option>
+                    )
+                  }
+                }
+                else {
+                  if (loja.id != 1) {
+                    return (
+                      <option key={index} value={loja.id}>{loja.nome}, {loja.localização}</option>
+                    )
+                  }
+                }
+              })}
+            </>)
+            : (<>
+              ?
+            </>)}
+        </select>
         <button type="button" onClick={handleCadastro}>Enviar</button>
       </form>
     </div>

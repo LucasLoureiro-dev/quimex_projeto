@@ -9,7 +9,7 @@ import generateHashedPassword from "../hashPassword.js";
 const listar_usuariosController = async (req, res) => {
   try {
     const listaUsuarios = await listar_usuarios();
-    res.status(200).json(listaUsuarios);
+    res.status(200).json({ listaUsuarios });
   } catch (err) {
     console.error("Erro listando usuarios: ", err);
     res
@@ -57,10 +57,12 @@ const criar_usuarioController = async (req, res) => {
 };
 const update_usuarioController = async (req, res) => {
   try {
-    const { nome, cpf, contato, sexo, cargo, vinculo, loja_vinculada } =
+    const id = req.params.id;
+    const { nome, cpf, contato, sexo, cargo, vinculo, loja_vinculada, re } =
       req.body;
     const data = {
       nome: nome,
+      re: re,
       cpf: cpf,
       contato: contato,
       sexo: sexo,
@@ -68,10 +70,9 @@ const update_usuarioController = async (req, res) => {
       vinculo: vinculo,
       loja_vinculada: loja_vinculada,
     };
-    const atualizaUsuario = await update_usuario(data);
+    const atualizaUsuario = await update_usuario(data, id);
     return res.status(200).json({
-      mensagem: "Usuário atualizado com sucesso!",
-      affectedRows: atualizaUsuario.affectedRows,
+      mensagem: "Usuário atualizado com sucesso!"
     });
   } catch (err) {
     console.error("Erro ao atualizar usuario: ", err);
@@ -80,7 +81,7 @@ const update_usuarioController = async (req, res) => {
 };
 const delete_usuarioController = async (req, res) => {
   try {
-    const { id } = req.body;
+    const id  = req.params.id;
     const deleteUsuario = await delete_usuario(id);
     return res.status(200).json({ mensagem: "Usuário deletado com sucesso!" });
   } catch (err) {

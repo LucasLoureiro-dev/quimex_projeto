@@ -37,7 +37,7 @@ export default function Lojas() {
             // Changed 'response.status' to 'res.status'
             return [];
           } else {
-            throw new Error("Erro ao buscar chamadas das lojas");
+            console.log(res);
           }
         }
       })
@@ -84,7 +84,9 @@ export default function Lojas() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const res = await fetch(`http://localhost:8080/lojas`);
+    const res = await fetch(`http://localhost:8080/lojas`,{
+      credentials: "include"
+    });
 
     const data = await res.json();
 

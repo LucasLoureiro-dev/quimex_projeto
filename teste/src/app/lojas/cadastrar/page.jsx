@@ -23,7 +23,9 @@ export default function Lojas() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const res = await fetch(`http://localhost:8080/lojas`);
+    const res = await fetch(`http://localhost:8080/lojas`,{
+      credentials: "include"
+    });
 
     const data = await res.json();
 

@@ -4,7 +4,9 @@ import express, { Router } from "express"
 
 const router = express.Router()
 
-router.get("/", listar_usuariosController)
-router.post("/", criar_usuarioController)
+router.get("/", listar_usuariosController);
+router.post("/", criar_usuarioController);
+router.put("/:id", update_usuarioController);
+router.delete("/:id", delete_usuarioController);
 
 export default router;
