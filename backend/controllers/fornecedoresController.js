@@ -1,64 +1,71 @@
 import {
- listar_lojas, criar_loja, atualizar_loja,  excluir_loja
-} from "../models/lojas.js";
+  listar_fornecedores,
+  criar_fornecedores,
+  atualizar_fornecedores,
+  excluir_fornecedores,
+} from "../models/Fornecedores.js";
 
-const listar_lojasController = async (req, res) => {
+const listar_fornecedoresController = async (req, res) => {
   try {
-    const lojas = await listar_lojas();
-    res.status(200).json({ lojas });
+    const fornecedores = await listar_fornecedores();
+    res.status(200).json({ fornecedores });
   } catch (err) {
-    console.error("Erro buscando lojas:", err);
+    console.error("Erro buscando fornecedores:", err);
     res
       .status(500)
-      .json({ message: "Erro ao buscar lojas", error: err.message });
+      .json({ message: "Erro ao buscar fornecedores", error: err.message });
   }
 };
 
-const criar_lojaController = async (req, res) => {
+const criar_fornecedorCotnroller = async (req, res) => {
   try {
-    const { produto } = req.body;
+    const { nome, contato, localizacao, cnpj, tipo_produto, loja_vinculada } =
+      req.body;
     const data = {
-      nome : nome ,
-      codigo_de_barras : codigo_de_barras ,
-      descricao : descricao ,
-      fornecedor : fornecedor ,
-      preco : preco 
+      nome: nome,
+      contato: contato,
+      localizacao: localizacao,
+      cnpj: cnpj,
+      tipo_produto: tipo_produto,
+      loja_vinculada: loja_vinculada,
     };
-    const criado = await criar_loja(data);
+    const criado = await criar_fornecedores(data);
     res.status(200).json({ criado });
   } catch (err) {
-    console.error("Erro criando produto químico:", err);
+    console.error("Erro criando fornecedor:", err);
     res
       .status(500)
-      .json({ message: "Erro ao criar produto químico", error: err.message });
+      .json({ message: "Erro ao criar fornecedor", error: err.message });
   }
 };
 
-const atualizar_lojaController = async (req, res) => {
+const atualizar_fornecedorController = async (req, res) => {
   try {
-     const { produto } = req.body;
+    const { nome, contato, localização, cnpj, tipo_produto, loja_vinculada } =
+      req.body;
     const data = {
-      nome : nome ,
-      codigo_de_barras : codigo_de_barras ,
-      descricao : descricao ,
-      fornecedor : fornecedor ,
-      preco : preco 
+      nome: nome,
+      contato: contato,
+      localização: localização,
+      cnpj: cnpj,
+      tipo_produto: tipo_produto,
+      loja_vinculada: loja_vinculada,
     };
-    const atualizado  = await atualizar_loja(data);
-    res.status(200).json({ atualizado });
+    const criado = await atualizar_fornecedores(data);
+    res.status(200).json({ criado });
   } catch (err) {
-    console.error("Erro atualizando produto químico:", err);
+    console.error("Erro criando fornecedor:", err);
     res
       .status(500)
-      .json({ message: "Erro ao atualizar produto químico", error: err.message });
+      .json({ message: "Erro ao criar fornecedor", error: err.message });
   }
 };
 
-const excluir_lojaController = async (req, res) => {
+const excluir_fornecedoresController = async (req, res) => {
   try {
     const id = req.params.id;
-    const excluir_produto = await excluir_loja(id);
-    res.status(200).json({ controle_diario });
+    const excluido = await excluir_fornecedores(id);
+    res.status(200).json({ "mensagem": "Fornecedor excluído com sucesso"});
   } catch (err) {
     console.error("Erro excluindo produto químico:", err);
     res
@@ -67,4 +74,9 @@ const excluir_lojaController = async (req, res) => {
   }
 };
 
-export { listar_lojasController, criar_lojaController, atualizar_lojaController, excluir_lojaController };
+export {
+  listar_fornecedoresController,
+  criar_fornecedorCotnroller,
+  atualizar_fornecedorController,
+  excluir_fornecedoresController,
+};

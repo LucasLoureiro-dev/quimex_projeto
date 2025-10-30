@@ -17,25 +17,24 @@ export default function Cadastrar() {
   });
   const [lojas, setLojas] = useState([]);
 
-
   useEffect(() => {
-    fetch('http://localhost:8080/lojas', {
-      credentials: "include"
+    fetch("http://localhost:8080/lojas", {
+      credentials: "include",
     })
       .then((res) => {
-        return res.json()
+        return res.json();
       })
       .then((data) => {
         setLojas(data.lojas);
-      })
+      });
   }, []);
 
   const handleCadastro = async (e) => {
     e.preventDefault();
     const res = await fetch(`http://localhost:8080/usuarios`, {
-      method: "POST", // HTTP method
+      method: "POST",
       headers: {
-        "Content-Type": "application/json", // Sending JSON data
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
         nome: form.nome,
@@ -54,20 +53,21 @@ export default function Cadastrar() {
       throw new Error("Network response was not ok " + res.status);
     }
 
-    const data = await res.json();
-
-    if (data.cargo == "Administrador") {
-      window.location.href = "/dashboard/adm";
-    } else if (data.cargo == "Gerente") {
-      window.location.href = "/dashboard/gerente";
-    } else if (data.cargo == "Vendedor") {
-      window.location.href = "/dashboard/pdv";
-    }
+    const data = await res.json().then(() => {
+      window.location.href = "/usuarios/gerenciador";
+    });
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+
     setForm({ ...form, [name]: value });
+    if (name == "vinculo") {
+      setForm((prevData) => ({
+        ...prevData,
+        loja_vinculada: "",
+      }));
+    }
   };
 
   return (
@@ -104,7 +104,6 @@ export default function Cadastrar() {
           onChange={handleChange}
           name="cpf"
           value={form.cpf}
-
           required
         />
         <label htmlFor="">Contato</label>
@@ -132,44 +131,57 @@ export default function Cadastrar() {
           required
         />
         <label htmlFor="">vinculo</label>
-        <select onChange={handleChange}
+        <select
+          onChange={handleChange}
           name="vinculo"
           value={form.vinculo}
-          required>
-          <option value="" disabled>Selecione a Loja</option>
-          <option value={"Matriz"} >Matriz</option>
+          required
+        >
+          <option value="" disabled>
+            Selecione a Loja
+          </option>
+          <option value={"Matriz"}>Matriz</option>
           <option value={"Filial"}>Filial</option>
         </select>
         <label htmlFor="car-name">Loja vinculada</label>
-        <select onChange={handleChange}
+        <select
+          onChange={handleChange}
           name="loja_vinculada"
           value={form.loja_vinculada}
-          required>
-          <option value="" disabled>Selecione a Loja</option>
-          {lojas
-            ? (<>
+          required
+        >
+          <option value="" disabled>
+            Selecione a Loja
+          </option>
+          {lojas ? (
+            <>
               {lojas.map((loja, index) => {
                 if (form.vinculo == "Matriz") {
                   if (loja.id == 1) {
                     return (
-                      <option key={index} value={loja.id}>{loja.nome}, {loja.localização}</option>
-                    )
+                      <option key={index} value={loja.id}>
+                        {loja.nome}, {loja.localização}
+                      </option>
+                    );
                   }
-                }
-                else {
+                } else {
                   if (loja.id != 1) {
                     return (
-                      <option key={index} value={loja.id}>{loja.nome}, {loja.localização}</option>
-                    )
+                      <option key={index} value={loja.id}>
+                        {loja.nome}, {loja.localização}
+                      </option>
+                    );
                   }
                 }
               })}
-            </>)
-            : (<>
-              ?
-            </>)}
+            </>
+          ) : (
+            <>?</>
+          )}
         </select>
-        <button type="button" onClick={handleCadastro}>Enviar</button>
+        <button type="button" onClick={handleCadastro}>
+          Enviar
+        </button>
       </form>
     </div>
   );

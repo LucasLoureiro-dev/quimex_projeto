@@ -2,33 +2,13 @@
 import Lojas from "@/app/lojas/page";
 import { useState, useEffect } from "react";
 
-export default function Gerenciador() {
-  const [usuarios, setUsuarios] = useState("");
-  const [lojas, setLojas] = useState("");
+export default function Fornecedores() {
+  const [fornecedores, setFornecedores] = useState("");
   const [editar, setEditar] = useState(false);
-  const [formData, setFormData] = useState({
-    nome: "",
-    cpf: "",
-    re: "",
-    contato: "",
-    sexo: "",
-    cargo: "",
-    vinculo: "",
-    loja_vinculada: "",
-  });
-  const [snapshot, setSnapshot] = useState({
-    nome: "",
-    cpf: "",
-    re: "",
-    contato: "",
-    sexo: "",
-    cargo: "",
-    vinculo: "",
-    loja_vinculada: "",
-  });
-
-  async function getUsuarios() {
-    fetch(`http://localhost:8080/usuarios`, {
+  const [snapshot, setSnapshot] = useState({});
+  const [formData, setFormData] = useState({});
+  async function getFornecedores() {
+    fetch(`http://localhost:8080/fornecedores`, {
       method: "get",
       credentials: "include",
     })
@@ -44,27 +24,27 @@ export default function Gerenciador() {
         }
       })
       .then((data) => {
-        return setUsuarios(data.listaUsuarios);
+        return setFornecedores(data.fornecedores);
       });
   }
 
   useEffect(() => {
-    getUsuarios();
+    getFornecedores();
   }, []);
 
-  useEffect(() => {
-    fetch("http://localhost:8080/lojas", {
-      credentials: "include",
-    })
-      .then((res) => {
-        return res.json();
-      })
-      .then((data) => {
-        setLojas(data.lojas);
-      });
-  }, []);
+//   useEffect(() => {
+//     fetch("http://localhost:8080/lojas", {
+//       credentials: "include",
+//     })
+//       .then((res) => {
+//         return res.json();
+//       })
+//       .then((data) => {
+//         setLojas(data.lojas);
+//       });
+//   }, []);
 
-  const editarUsuario = (usuario) => {
+  const setEditarFornecedor = (usuario) => {
     setEditar(true);
     setSnapshot({
       id: usuario.id,
@@ -92,12 +72,6 @@ export default function Gerenciador() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    if(name == "vinculo") {
-        setFormData((prevData) => ({
-            ...prevData,
-            "loja_vinculada": "",
-        }))
-    }
     setFormData((prevData) => ({
       ...prevData,
       [name]: value,
@@ -107,18 +81,7 @@ export default function Gerenciador() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const repetido = usuarios.find(
-      (usuario) => usuario.cpf === formData.cpf || usuario.RE === formData.re
-    );
-
-    if (JSON.stringify(snapshot) == JSON.stringify(formData)) {
-      return alert("Não houve alterações");
-    } else if (repetido) {
-      if (repetido.id != formData.id) {
-        return alert("Alguns dados entram em conflitos com outros usuários");
-      }
-    }
-    fetch(`http://localhost:8080/usuarios/${formData.id}`, {
+    fetch(`http://localhost:8080/fornecedores/${formData.id}`, {
       method: "put",
       credentials: "include",
       headers: {
@@ -139,14 +102,14 @@ export default function Gerenciador() {
       })
       .then((data) => {
         setSnapshot([]);
-        getUsuarios();
+        getFornecedores();
         setEditar(false);
       });
   };
 
   const handleDelete = async (id) => {
     try {
-      const res = await fetch(`http://localhost:8080/usuarios/${id}`, {
+      const res = await fetch(`http://localhost:8080/fornecedores/${id}`, {
         method: "delete",
         credentials: "include",
       });
@@ -161,7 +124,7 @@ export default function Gerenciador() {
           throw new Error("Erro ao deletar loja");
         }
       } else {
-        getUsuarios();
+        getFornecedores();
       }
     } catch (err) {
       alert("Não foi possível excluir este usuário.");
@@ -190,44 +153,13 @@ export default function Gerenciador() {
           </tr>
         </thead>
         <tbody>
-          {usuarios && usuarios.length > 0 ? (
+          {fornecedores && fornecedores.length > 0 ? (
             <>
-              {usuarios.map((usuario, index) => {
+              {fornecedores.map((fornecedor, index) => {
                 return (
                   <tr key={index}>
                     <td style={{ border: "1px solid black", padding: "8px" }}>
-                      {usuario.nome}
-                    </td>
-                    <td style={{ border: "1px solid black", padding: "8px" }}>
-                      {usuario.cpf}
-                    </td>
-                    <td style={{ border: "1px solid black", padding: "8px" }}>
-                      {usuario.RE}
-                    </td>
-                    <td style={{ border: "1px solid black", padding: "8px" }}>
-                      {usuario.contato}
-                    </td>
-                    <td style={{ border: "1px solid black", padding: "8px" }}>
-                      {usuario.sexo}
-                    </td>
-                    <td style={{ border: "1px solid black", padding: "8px" }}>
-                      {usuario.cargo}
-                    </td>
-                    <td style={{ border: "1px solid black", padding: "8px" }}>
-                      {usuario.vinculo}
-                    </td>
-                    <td style={{ border: "1px solid black", padding: "8px" }}>
-                      {lojas ? (
-                        <>
-                          {
-                            lojas.find(
-                              (loja) => loja.id == usuario.loja_vinculada
-                            ).nome
-                          }
-                        </>
-                      ) : (
-                        <>?</>
-                      )}
+                      {fornecedor.nome}
                     </td>
                     <td className="border border-black px-4 py-2">
                       <div className="flex space-x-2">
@@ -354,31 +286,6 @@ export default function Gerenciador() {
               <option value="" disabled>
                 Selecione a Loja
               </option>
-              {lojas ? (
-                <>
-                  {lojas.map((loja, index) => {
-                    if (formData.vinculo == "Matriz") {
-                      if (loja.id == 1) {
-                        return (
-                          <option key={index} value={loja.id}>
-                            {loja.nome}, {loja.localização}
-                          </option>
-                        );
-                      }
-                    } else {
-                      if (loja.id != 1) {
-                        return (
-                          <option key={index} value={loja.id}>
-                            {loja.nome}, {loja.localização}
-                          </option>
-                        );
-                      }
-                    }
-                  })}
-                </>
-              ) : (
-                <>?</>
-              )}
             </select>
             <button type="button" onClick={handleSubmit}>
               Enviar

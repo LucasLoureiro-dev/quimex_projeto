@@ -9,6 +9,8 @@ create table fornecedores(
     contato varchar(255) not null,
     localizacao varchar(255) not null,
     cnpj varchar(255) not null,
+    loja_vinculada int not null,
+    foreign key (loja_vinculada) references lojas(id),
     tipo_produto varchar(32)
 );
     

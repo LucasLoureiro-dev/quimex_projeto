@@ -23,9 +23,9 @@ const criar_fornecedores = async (data) => {
   }
 };
 
-const atualizar_fornecedores = async (id) => {
+const atualizar_fornecedores = async (data, id) => {
   try {
-    return await update("fornecedores", `id = '${id}'`);
+    return await update("fornecedores", data, `id = '${id}'`);
   } catch (err) {
     console.log(`Houve um erro ao atualizar o fornecedor: ${err}`);
     throw new Error("Falha ao atualizar o fornecedor");
