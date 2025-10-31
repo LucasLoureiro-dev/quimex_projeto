@@ -23,7 +23,12 @@ export default function Home() {
     });
 
     if (!res.ok) {
-      throw new Error("Network response was not ok " + res.status);
+      if (res.status == 401) {
+        alert('Usuário ou senha inválidos');
+      }
+      if (res.status == 404) {
+        alert('Usuário não encontrado');
+      }
     }
 
     const data = await res.json();

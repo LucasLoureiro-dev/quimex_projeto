@@ -5,8 +5,38 @@ import { useState, useEffect } from "react";
 export default function Fornecedores() {
   const [fornecedores, setFornecedores] = useState("");
   const [editar, setEditar] = useState(false);
-  const [snapshot, setSnapshot] = useState({});
-  const [formData, setFormData] = useState({});
+  const [snapshot, setSnapshot] = useState({
+      id: "",
+      nome: "",
+      contato: "",
+      localizacao: "",
+      cnpj: "",
+      loja_vinculada: "",
+      tipo_produto: ""
+    });
+  const [formData, setFormData] = useState({
+      id: "",
+      nome: "",
+      contato: "",
+      localizacao: "",
+      cnpj: "",
+      loja_vinculada: "",
+      tipo_produto: ""
+    });
+  const [lojas, setLojas] = useState("");
+
+  useEffect(() => {
+    fetch("http://localhost:8080/lojas", {
+      credentials: "include",
+    })
+      .then((res) => {
+        return res.json();
+      })
+      .then((data) => {
+        setLojas(data.lojas);
+      });
+  }, []);
+
   async function getFornecedores() {
     fetch(`http://localhost:8080/fornecedores`, {
       method: "get",
@@ -32,41 +62,37 @@ export default function Fornecedores() {
     getFornecedores();
   }, []);
 
-//   useEffect(() => {
-//     fetch("http://localhost:8080/lojas", {
-//       credentials: "include",
-//     })
-//       .then((res) => {
-//         return res.json();
-//       })
-//       .then((data) => {
-//         setLojas(data.lojas);
-//       });
-//   }, []);
+  //   useEffect(() => {
+  //     fetch("http://localhost:8080/lojas", {
+  //       credentials: "include",
+  //     })
+  //       .then((res) => {
+  //         return res.json();
+  //       })
+  //       .then((data) => {
+  //         setLojas(data.lojas);
+  //       });
+  //   }, []);
 
-  const setEditarFornecedor = (usuario) => {
+  const handleEditarFornecedor = (fornecedor) => {
     setEditar(true);
     setSnapshot({
-      id: usuario.id,
-      nome: usuario.nome,
-      cpf: usuario.cpf,
-      re: usuario.RE,
-      contato: usuario.contato,
-      sexo: usuario.sexo,
-      cargo: usuario.cargo,
-      vinculo: usuario.vinculo,
-      loja_vinculada: usuario.loja_vinculada,
+      id: fornecedor.id,
+      nome: fornecedor.nome,
+      contato: fornecedor.contato,
+      localizacao: fornecedor.localizacao,
+      cnpj: fornecedor.cnpj,
+      loja_vinculada: fornecedor.loja_vinculada,
+      tipo_produto: fornecedor.tipo_produto
     });
     setFormData({
-      id: usuario.id,
-      nome: usuario.nome,
-      cpf: usuario.cpf,
-      re: usuario.RE,
-      contato: usuario.contato,
-      sexo: usuario.sexo,
-      cargo: usuario.cargo,
-      vinculo: usuario.vinculo,
-      loja_vinculada: "",
+      id: fornecedor.id,
+      nome: fornecedor.nome,
+      contato: fornecedor.contato,
+      localizacao: fornecedor.localizacao,
+      cnpj: fornecedor.cnpj,
+      loja_vinculada: fornecedor.loja_vinculada,
+      tipo_produto: fornecedor.tipo_produto
     });
   };
 
@@ -136,20 +162,14 @@ export default function Fornecedores() {
         <thead>
           <tr>
             <th style={{ border: "1px solid black", padding: "8px" }}>Nome</th>
-            <th style={{ border: "1px solid black", padding: "8px" }}>CPF</th>
-            <th style={{ border: "1px solid black", padding: "8px" }}>RE</th>
+            <th style={{ border: "1px solid black", padding: "8px" }}>Contato</th>
+            <th style={{ border: "1px solid black", padding: "8px" }}>Localização</th>
             <th style={{ border: "1px solid black", padding: "8px" }}>
-              Contato
+              CNPJ
             </th>
-            <th style={{ border: "1px solid black", padding: "8px" }}>Sexo</th>
-            <th style={{ border: "1px solid black", padding: "8px" }}>Cargo</th>
-            <th style={{ border: "1px solid black", padding: "8px" }}>
-              Vínculo
-            </th>
-            <th style={{ border: "1px solid black", padding: "8px" }}>
-              Loja vinculada
-            </th>
-            <th style={{ border: "1px solid black", padding: "8px" }}>Ação</th>
+            <th style={{ border: "1px solid black", padding: "8px" }}>Loja Vinculada</th>
+            <th style={{ border: "1px solid black", padding: "8px" }}>Tipo de produto</th>
+
           </tr>
         </thead>
         <tbody>
@@ -161,12 +181,37 @@ export default function Fornecedores() {
                     <td style={{ border: "1px solid black", padding: "8px" }}>
                       {fornecedor.nome}
                     </td>
+                    <td style={{ border: "1px solid black", padding: "8px" }}>
+                      {fornecedor.contato}
+                    </td>
+                    <td style={{ border: "1px solid black", padding: "8px" }}>
+                      {fornecedor.localizacao}
+                    </td>
+                    <td style={{ border: "1px solid black", padding: "8px" }}>
+                      {fornecedor.cnpj}
+                    </td>
+                    <td style={{ border: "1px solid black", padding: "8px" }}>
+                      {lojas ? (
+                        <>
+                          {
+                            lojas.find(
+                              (loja) => loja.id == fornecedor.loja_vinculada
+                            ).nome
+                          }
+                        </>
+                      ) : (
+                        <>?</>
+                      )}
+                    </td>
+                    <td style={{ border: "1px solid black", padding: "8px" }}>
+                      {fornecedor.tipo_produto}
+                    </td>
                     <td className="border border-black px-4 py-2">
                       <div className="flex space-x-2">
                         {/* Edit Icon */}
                         <button
                           className="text-blue-500 hover:text-blue-700"
-                          onClick={() => editarUsuario(usuario)}
+                          onClick={() => handleEditarFornecedor(fornecedor)}
                         >
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -180,7 +225,7 @@ export default function Fornecedores() {
                         {/* Delete Icon */}
                         <button
                           className="text-red-500 hover:text-red-700"
-                          onClick={() => handleDelete(usuario.id)}
+                          onClick={() => handleDelete(fornecedor.id)}
                         >
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -223,22 +268,6 @@ export default function Fornecedores() {
               value={formData.nome}
               required
             />
-            <label htmlFor="">Re</label>
-            <input
-              type="text"
-              onChange={handleChange}
-              name="re"
-              value={formData.re}
-              required
-            />
-            <label htmlFor="">CPF</label>
-            <input
-              type="number"
-              onChange={handleChange}
-              name="cpf"
-              value={formData.cpf}
-              required
-            />
             <label htmlFor="">Contato</label>
             <input
               type="text"
@@ -247,46 +276,39 @@ export default function Fornecedores() {
               value={formData.contato}
               required
             />
-            <label htmlFor="">Sexo</label>
+            <label htmlFor="">Localização</label>
             <input
               type="text"
               onChange={handleChange}
-              name="sexo"
-              value={formData.sexo}
+              name="localizacao"
+              value={formData.localizacao}
               required
             />
-            <label htmlFor="">Cargo</label>
+            <label htmlFor="">CNPJ</label>
             <input
               type="text"
               onChange={handleChange}
-              name="cargo"
-              value={formData.cargo}
+              name="cnpj"
+              value={formData.cnpj}
               required
             />
-            <label htmlFor="">vinculo</label>
-            <select
-              onChange={handleChange}
-              name="vinculo"
-              value={formData.vinculo}
-              required
-            >
-              <option value="" disabled>
-                Selecione a Loja
-              </option>
-              <option value={"Matriz"}>Matriz</option>
-              <option value={"Filial"}>Filial</option>
-            </select>
-            <label htmlFor="car-name">Loja vinculada</label>
-            <select
+            <label htmlFor="">Loja Vincular</label>
+            <input
+              type="text"
               onChange={handleChange}
               name="loja_vinculada"
               value={formData.loja_vinculada}
               required
-            >
-              <option value="" disabled>
-                Selecione a Loja
-              </option>
-            </select>
+            />
+
+            <label htmlFor="">Tipo de produto</label>
+            <input
+              type="text"
+              onChange={handleChange}
+              name="tipo_produto"
+              value={formData.tipo_produto}
+              required
+            />
             <button type="button" onClick={handleSubmit}>
               Enviar
             </button>

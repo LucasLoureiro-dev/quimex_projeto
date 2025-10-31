@@ -7,7 +7,7 @@ const dashboardController = async (req, res) => {
     const listaUsuarios = await listar_usuarios();
     const usuario = await listaUsuarios.find((i) => i.id == req.session.usuario);
     res.status(200).json({
-      id: usuario.Id,
+      id: usuario.id,
       usuario: usuario.nome,
       cargo: usuario.cargo,
       RE: usuario.RE,

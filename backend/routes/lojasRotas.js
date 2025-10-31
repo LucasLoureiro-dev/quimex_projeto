@@ -6,7 +6,7 @@ import adminMiddleware from "../middleware/adminMiddleware.js";
 
 const router = express.Router();
 
-router.get('/', adminMiddleware, listar_lojasController);
+router.get('/', listar_lojasController);
 
 router.post('/', adminMiddleware, criar_lojaController);
 
