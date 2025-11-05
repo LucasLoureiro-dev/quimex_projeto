@@ -10,6 +10,9 @@ import startChat from "./routes/chatRotas.js";
 import dashboard from "./routes/dashboadRota.js";
 import lojas from "./routes/lojasRotas.js";
 import fornecedores from "./routes/fornecedoresRotas.js";
+import estoque from "./routes/estoqueRota.js";
+import produtos_quimicos from "./routes/produtos_quimicosRotas.js";
+import produtos from "./routes/produtosRotas.js";
 
 // 1. Carrega variáveis de ambiente PRIMEIRO
 dotenv.config();
@@ -39,7 +42,9 @@ app.use(
   })
 );
 
-
+app.use("/produtos", produtos);
+app.use("/produtos_quimicos", produtos_quimicos);
+app.use("/estoque", estoque);
 app.use("/usuarios", usuario);
 app.use("/chat", chat);
 app.use("/login", login);

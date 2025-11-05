@@ -1,6 +1,5 @@
 import {
   readAll,
-  read_some,
   update,
   deleteRecord,
   create,
@@ -9,37 +8,37 @@ import {
 
 const listar_estoque = async () => {
   try {
-    return await readAll("fornecedores");
+    return await readAll("estoque");
   } catch (err) {
-    console.log(`Houve um erro ao listar os fornecedores: ${err}`);
-    throw new Error("Falha ao listar os fornecedores");
+    console.log(`Houve um erro ao listar o estoque: ${err}`);
+    throw new Error("Falha ao listar o estoque");
   }
 };
 
 const criar_estoque = async (data) => {
   try {
-    return await create("fornecedores", data);
+    return await create("estoque", data);
   } catch (err) {
-    console.log(`Houve um erro ao criar o fornecedor: ${err}`);
-    throw new Error("Falha ao criar os fornecedor");
+    console.log(`Houve um erro ao criar o estoque: ${err}`);
+    throw new Error("Falha ao criar os estoque");
   }
 };
 
 const atualizar_estoque = async (id) => {
   try {
-    return await update("fornecedores", `id = '${id}'`);
+    return await update("estoque", `id = '${id}'`);
   } catch (err) {
-    console.log(`Houve um erro ao atualizar o fornecedor: ${err}`);
-    throw new Error("Falha ao atualizar o fornecedor");
+    console.log(`Houve um erro ao atualizar o estoque: ${err}`);
+    throw new Error("Falha ao atualizar o estoque");
   }
 };
 
 const excluir_estoque = async (id) => {
   try {
-    return await deleteRecord("fornecedores", `id = '${id}'`);
+    return await deleteRecord("estoque", `id = '${id}'`);
   } catch (err) {
-    console.log(`Houve um erro ao excluir o fornecedor: ${err}`);
-    throw new Error("Falha ao excluir o fornecedor");
+    console.log(`Houve um erro ao excluir o estoque: ${err}`);
+    throw new Error("Falha ao excluir o estoque");
   }
 };
 

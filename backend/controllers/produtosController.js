@@ -19,13 +19,13 @@ const listar_produtosController = async (req, res) => {
 
 const criar_produtoController = async (req, res) => {
   try {
-    const { produto } = req.body;
+    const produto = req.body;
     const data = {
-      nome : nome ,
-      codigo_de_barras : codigo_de_barras ,
-      descricao : descricao ,
-      fornecedor : fornecedor ,
-      preco : preco 
+      nome: produto.nome,
+      codigo_de_barras: produto.codigo_de_barras,
+      descricao: produto.descricao,
+      fornecedor: produto.fornecedor,
+      preco: produto.preco,
     };
     const criado = await criar_produto(data);
     res.status(200).json({ criado });
@@ -39,15 +39,15 @@ const criar_produtoController = async (req, res) => {
 
 const atualizar_produtoController = async (req, res) => {
   try {
-     const { produto } = req.body;
+    const produto = req.body;
     const data = {
-      nome : nome ,
-      codigo_de_barras : codigo_de_barras ,
-      descricao : descricao ,
-      fornecedor : fornecedor ,
-      preco : preco 
+      nome: produto.nome,
+      codigo_de_barras: produto.codigo_de_barras,
+      descricao: produto.descricao,
+      fornecedor: produto.fornecedor,
+      preco: produto.preco,
     };
-    const atualizado  = await atualizar_produto(data);
+    const atualizado = await atualizar_produto(data);
     res.status(200).json({ atualizado });
   } catch (err) {
     console.error("Erro atualizando produto:", err);
@@ -70,4 +70,9 @@ const excluir_produtoController = async (req, res) => {
   }
 };
 
-export { listar_produtosController, criar_produtoController, atualizar_produtoController, excluir_produtoController };
+export {
+  listar_produtosController,
+  criar_produtoController,
+  atualizar_produtoController,
+  excluir_produtoController,
+};

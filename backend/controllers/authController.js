@@ -4,9 +4,9 @@ import { JWT_SECRET } from "../config/jwt.js"; // Importar a chave secreta
 
 const loginController = async (req, res) => {
   try {
-    const { RE, senha } = req.body;
+    const { RE, senha, cargo } = req.body;
     // Verificar se o usuário existe no banco de dados
-    const usuario = await read("usuarios", ` RE = '${RE}'`);
+    const usuario = await read("usuarios", ` RE = '${RE}' AND cargo = '${cargo}'`);
 
     if (!usuario) {
       return res.status(404).json({ mensagem: "Usuário não encontrado" });

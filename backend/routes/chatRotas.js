@@ -16,7 +16,7 @@ export function startChat(server) {
 
   const usuariosConectados = new Map(); // socket.id -> { usuario }
 
-  iio.on("connection", (socket) => {
+  io.on("connection", (socket) => {
     console.log("Novo cliente conectado:", socket.id);
 
     // Quando um cliente se identifica

@@ -1,6 +1,5 @@
 import {
   readAll,
-  read_some,
   update,
   deleteRecord,
   create,

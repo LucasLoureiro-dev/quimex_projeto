@@ -33,7 +33,7 @@ const criar_lojaController = async (req, res) => {
       cep: cep,
       contato: contato,
       horario_abertura: horario_abertura,
-      horario_fenchamento: horario_fechamento,
+      horario_fechamento: horario_fechamento,
     };
     const criado = await criar_loja(data);
     res.status(200).json({ criado });
@@ -60,7 +60,7 @@ const atualizar_lojaController = async (req, res) => {
       cep: cep,
       contato: contato,
       horario_abertura: horario_abertura,
-      horario_fenchamento: horario_fechamento,
+      horario_fechamento: horario_fechamento,
     };
     const atualizado = await atualizar_loja(id, data);
     res.status(200).json({ atualizado });

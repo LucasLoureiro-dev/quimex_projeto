@@ -55,7 +55,7 @@ export default function Lojas() {
       cep: loja.cep,
       contato: loja.contato,
       horario_abertura: loja.horario_abertura,
-      horario_fechamento: loja.horario_fenchamento,
+      horario_fechamento: loja.horario_fechamento,
     });
     setFormData({
       id: loja.id,
@@ -64,7 +64,7 @@ export default function Lojas() {
       cep: loja.cep,
       contato: loja.contato,
       horario_abertura: loja.horario_abertura,
-      horario_fechamento: loja.horario_fenchamento,
+      horario_fechamento: loja.horario_fechamento,
     });
   };
 
@@ -479,7 +479,7 @@ export default function Lojas() {
                 <p className="block text-gray-700 text-sm font-bold mb-2">
                   Horário de Fechamento:{" "}
                   <span className="font-normal">
-                    {lojaSelecionada.horario_fenchamento}
+                    {lojaSelecionada.horario_fechamento}
                   </span>
                 </p>
               </div>

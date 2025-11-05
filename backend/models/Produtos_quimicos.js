@@ -1,6 +1,5 @@
 import {
   readAll,
-  read_some,
   update,
   deleteRecord,
   create,
@@ -18,6 +17,7 @@ const listar_produtosQuimicos = async () => {
 
 const criar_produtoQuimicos = async (data) => {
   try {
+    console.log(data);
     return await create("produtos_quimicos", data);
   } catch (err) {
     console.log(`Houve um erro ao criar o produtos quimicos: ${err}`);

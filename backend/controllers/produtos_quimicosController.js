@@ -1,5 +1,8 @@
 import {
- listar_produtosQuimicos, criar_produtoQuimicos, atualizar_produtoQuimico, excluir_produtoQuimico 
+  listar_produtosQuimicos,
+  criar_produtoQuimicos,
+  atualizar_produtoQuimico,
+  excluir_produtoQuimico,
 } from "../models/Produtos_quimicos.js";
 
 const listar_produtos_quimicosController = async (req, res) => {
@@ -10,20 +13,23 @@ const listar_produtos_quimicosController = async (req, res) => {
     console.error("Erro buscando produtos químicos:", err);
     res
       .status(500)
-      .json({ message: "Erro ao buscar produtos químicos", error: err.message });
+      .json({
+        message: "Erro ao buscar produtos químicos",
+        error: err.message,
+      });
   }
 };
 
 const criar_produto_quimicosController = async (req, res) => {
   try {
-    const { produto } = req.body;
+    const produto = req.body;
     const data = {
-      nome : nome ,
-      codigo_de_barras : codigo_de_barras ,
-      descricao : descricao ,
-      fornecedor : fornecedor ,
-      preco : preco 
+      nome: produto.nome,
+      preco: produto.preco,
+      fornecedor: produto.fornecedor,
+      composicao: produto.composicao,
     };
+
     const criado = await criar_produtoQuimicos(data);
     res.status(200).json({ criado });
   } catch (err) {
@@ -36,21 +42,23 @@ const criar_produto_quimicosController = async (req, res) => {
 
 const atualizar_produto_quimicosController = async (req, res) => {
   try {
-     const { produto } = req.body;
+    const produto = req.body;
     const data = {
-      nome : nome ,
-      codigo_de_barras : codigo_de_barras ,
-      descricao : descricao ,
-      fornecedor : fornecedor ,
-      preco : preco 
+      nome: produto.nome,
+      preco: produto.preco,
+      fornecedor: produto.fornecedor,
+      composicao: produto.composicao,
     };
-    const atualizado  = await atualizar_produtoQuimico(data);
+    const atualizado = await atualizar_produtoQuimico(data);
     res.status(200).json({ atualizado });
   } catch (err) {
     console.error("Erro atualizando produto químico:", err);
     res
       .status(500)
-      .json({ message: "Erro ao atualizar produto químico", error: err.message });
+      .json({
+        message: "Erro ao atualizar produto químico",
+        error: err.message,
+      });
   }
 };
 
@@ -67,4 +75,9 @@ const excluir_produto_quimicosController = async (req, res) => {
   }
 };
 
-export { listar_produtos_quimicosController, criar_produto_quimicosController, atualizar_produto_quimicosController, excluir_produto_quimicosController };
+export {
+  listar_produtos_quimicosController,
+  criar_produto_quimicosController,
+  atualizar_produto_quimicosController,
+  excluir_produto_quimicosController,
+};
