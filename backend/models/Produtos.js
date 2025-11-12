@@ -24,9 +24,9 @@ const criar_produto = async (data) => {
   }
 };
 
-const atualizar_produto = async (id) => {
+const atualizar_produto = async (id, data) => {
   try {
-    return await update("produtos", `id = '${id}'`);
+    return await update("produtos", data, `id = '${id}'`);
   } catch (err) {
     console.log(`Houve um erro ao atualizar o produtos: ${err}`);
     throw new Error("Falha ao atualizar o produtos");

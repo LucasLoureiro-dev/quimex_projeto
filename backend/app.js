@@ -32,6 +32,7 @@ app.use(
   })
 );
 
+app.use(express.urlencoded({ extended: true })); // For parsing application/x-www-form-urlencoded
 app.use(express.json());
 app.use(
   session({
@@ -42,6 +43,7 @@ app.use(
   })
 );
 
+app.use('/uploads', express.static('uploads'));
 app.use("/produtos", produtos);
 app.use("/produtos_quimicos", produtos_quimicos);
 app.use("/estoque", estoque);

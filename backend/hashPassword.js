@@ -16,3 +16,5 @@ export default async function generateHashedPassword(password) {
     process.exit(1); // Encerra o processo com código de erro
   }
 }
+
+generateHashedPassword();
