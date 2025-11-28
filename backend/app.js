@@ -13,6 +13,9 @@ import fornecedores from "./routes/fornecedoresRotas.js";
 import estoque from "./routes/estoqueRota.js";
 import produtos_quimicos from "./routes/produtos_quimicosRotas.js";
 import produtos from "./routes/produtosRotas.js";
+import despesas from "./routes/despesasRotas.js"
+import transferencias from "./routes/tranferenciaRotas.js"
+import contas from "./routes/contasRotas.js"
 
 // 1. Carrega variáveis de ambiente PRIMEIRO
 dotenv.config();
@@ -53,6 +56,9 @@ app.use("/login", login);
 app.use("/dashboard", dashboard);
 app.use("/lojas", lojas);
 app.use("/fornecedores", fornecedores);
+app.use("/despesas", despesas)
+app.use("/transferencias", transferencias);
+app.use("/contas", contas);
 
 server
   .listen(porta, () => {

@@ -1,0 +1,5 @@
+.gitmodules
+
+frontend/node_modules/
+
+.vscode
