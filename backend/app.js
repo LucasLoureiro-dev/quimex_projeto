@@ -9,6 +9,10 @@ import chat from "./routes/chatRotas.js";
 import startChat from "./routes/chatRotas.js";
 import dashboard from "./routes/dashboadRota.js";
 import lojas from "./routes/lojasRotas.js";
+import contas from "./routes/contasRotas.js";
+import despesas from "./routes/despesasRotas.js";
+import controle_diario from "./routes/controle_diarioRotas.js";
+import transferencias from "./routes/tranferenciaRotas.js"
 
 // 1. Carrega variáveis de ambiente PRIMEIRO
 dotenv.config();
@@ -44,6 +48,10 @@ app.use("/chat", chat);
 app.use("/login", login);
 app.use("/dashboard", dashboard);
 app.use("/lojas", lojas);
+app.use("/contas", contas)
+app.use("/transferencias", transferencias)
+app.use("/controle_diario", controle_diario)
+app.use("/despesas", despesas)
 
 server
   .listen(porta, () => {

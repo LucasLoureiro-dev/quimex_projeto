@@ -62,7 +62,7 @@ export default function DashboardPage() {
 
     const resJson = await res.json()
 
-    const funcionarios = await resJson.listaUsuarios
+    const funcionarios = await resJson
 
     setFuncionarios(funcionarios)
   }

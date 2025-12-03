@@ -37,7 +37,7 @@ export default function CardLojas({ loja, onEdit, onDelete }) {
     const busca = await fetch("http://localhost:8080/usuarios")
     const res = await busca.json()
 
-    const usuarios = res.listaUsuarios
+    const usuarios = res
     return usuarios;
   }
 

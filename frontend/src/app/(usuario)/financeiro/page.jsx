@@ -34,7 +34,6 @@ const DADOS_FILIAIS = [
   { id: "2", nome: "Quimex RJ", receita: 1950000, despesas: 1400000 },
   { id: "3", nome: "Quimex MG", receita: 1650000, despesas: 1200000 },
 ]
- 
 const FLUXO_INICIAL = [
   { id: 1, filial: "Quimex SP", data: "2024-11-12", tipo: "receita", valor: 80000, descricao: "Venda Lote #SP125" },
   { id: 3, filial: "Quimex SP", data: "2024-11-11", tipo: "despesa", valor: 50000, descricao: "Fornecedor A" },
@@ -44,7 +43,7 @@ const CONTAS_INICIAL = [
   { id: 1, filial: "Quimex SP", tipo: "Salário", descricao: "Salários Mês", valor: 150000, vencimento: "2024-12-05", pago: false },
   { id: 2, filial: "Quimex RJ", tipo: "Fornecedor", descricao: "Compra Metanol", valor: 250000, vencimento: "2024-11-30", pago: false },
 ]
- 
+
 //  NOVO: DADOS DE VENDAS PDV
 const VENDAS_PDV_INICIAL = [
   { id: "10234", itens: "2x Ácido Sulfúrico 5L, 1x Probeta Vidro", valor: 450.00, pagamento: "Pix", horario: "10:45", operador: "Carlos Silva" },
@@ -52,21 +51,21 @@ const VENDAS_PDV_INICIAL = [
   { id: "10232", itens: "10x Luvas Nitrílicas (Caixa)", valor: 350.00, pagamento: "Dinheiro", horario: "09:30", operador: "Carlos Silva" },
   { id: "10231", itens: "1x Kit Reagentes Básico", valor: 890.00, pagamento: "Boleto", horario: "08:15", operador: "Roberto Dias" },
 ]
- 
+
 const PRODUTOS_POR_FILIAL = {
   "Quimex SP": [{ id: 1, nome: "Ácido Sulfúrico", quantidade: 120, preco: 850 }],
   "Quimex RJ": [{ id: 1, nome: "Ácido Nítrico", quantidade: 80, preco: 900 }],
 }
- 
+
 const formatCurrency = (val) => val >= 1000000 ? `R$ ${(val / 1000000).toFixed(2)}M` : `R$ ${val.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`
 const formatShortDate = (date) => date ? new Intl.DateTimeFormat('pt-BR').format(new Date(date)) : "N/A"
 const getToday = () => new Date().toISOString().split('T')[0]
  
-export default function FinancialDashboard() {
+export default function Financeiro() {
   const [filiais, setFiliais] = useState(DADOS_FILIAIS)
   const [fluxo, setFluxo] = useState(FLUXO_INICIAL)
   const [contas, setContas] = useState(CONTAS_INICIAL)
-  const [vendasPdv, setVendasPdv] = useState(VENDAS_PDV_INICIAL) // Novo estado para vendas PDV
+  const [vendasPdv, setVendasPdv] = useState(VENDAS_PDV_INICIAL)
  
   // Controle de Modais
   const [modais, setModais] = useState({ pagar: false, report: false, transacao: false, detalhes: false })

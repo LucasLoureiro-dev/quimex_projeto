@@ -2,6 +2,7 @@
  
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
+// import { useAuth } from "@/app/contexts/auth-context"
 import { User, Lock, Sun, Moon } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -11,8 +12,10 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
  
 export default function LoginPage() {
   const router = useRouter()
+  // const { login } = useAuth()
+ 
   const [theme, setTheme] = useState("dark")
-  const [re, setRe] = useState("")
+  const [re, setre] = useState("")
   const [password, setPassword] = useState("")
   const [profile, setProfile] = useState("")
   const [error, setError] = useState("")
@@ -163,7 +166,7 @@ export default function LoginPage() {
                   type="re"
                   placeholder="seu@re.com"
                   value={re}
-                  onChange={(e) => setRe(e.target.value)}
+                  onChange={(e) => setre(e.target.value)}
                   required
                   className={`pl-10 h-12 rounded-lg transition-all duration-200 ${theme === "dark"
                       ? "bg-slate-950/50 border-slate-800 text-slate-200 placeholder:text-slate-600"
