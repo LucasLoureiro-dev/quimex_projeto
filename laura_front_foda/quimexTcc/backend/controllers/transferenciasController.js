@@ -12,9 +12,10 @@ const listar_transferenciasController = async (req, res) => {
   }
 };
 
-const criar_transferenciaController = async (data) => {
+const criar_transferenciaController = async (req, res) => {
   try {
-    const { dados } = req.body;
+    console.log(req.body)
+    const dados  = req.body;
     const data = {
       loja: dados.loja,
       produto: dados.produto,
@@ -22,6 +23,7 @@ const criar_transferenciaController = async (data) => {
       preco: dados.preco,
       troco: dados.troco,
     };
+    console.log(data)
     const criado = await criar_transferencia(data);
     res.status(200).json({ criado });
   } catch (err) {
@@ -32,9 +34,9 @@ const criar_transferenciaController = async (data) => {
   }
 };
 
-const atualizar_transferenciaController = async (data) => {
+const atualizar_transferenciaController = async (req, res) => {
   try {
-    const { dados } = req.body;
+    const dados = req.body;
     const data = {
       loja: dados.funcionario,
       valor: dados.abertura,

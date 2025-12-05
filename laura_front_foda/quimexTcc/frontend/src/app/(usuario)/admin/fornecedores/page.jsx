@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useState, useMemo, useEffect } from "react";
 import { useAuth } from "@/app/contexts/auth-context";
 import { Button } from "@/components/ui/button";
@@ -36,7 +37,13 @@ import { ControlePaginacao } from "@/components/paginacao/controlePaginacao";
 import { CardFornecedor } from "@/components/cards/CardFornecedor";
 
 export default function FornecedoresPage() {
-  const { user } = useAuth();
+    const { user, isLoading } = useAuth();
+    const router = useRouter();
+    useEffect(() => {
+      if (!isLoading && !user) {
+        router.push("/login");
+      }
+    }, [user, isLoading, router]);
 
   // --- 1. MOVED ALL STATE HOOKS TO THE TOP ---
   const [fornecedores, setFornecedores] = useState([]); // Initialize as array to avoid map errors
@@ -56,6 +63,12 @@ export default function FornecedoresPage() {
     localizacao: "",
     loja_vinculada: "",
   });
+
+  //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  //CÓDIGO PARA MANDAR PRO LOGIN
+  //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
   const [lojas, setLojas] = useState([]);
 
@@ -178,8 +191,10 @@ export default function FornecedoresPage() {
         headers: { "content-type": "application/json" },
         body: JSON.stringify(formData),
       }).then((res) => {
-        if (!res.ok) return alert("Houve um erro");
-      });
+        if (!res.ok) {
+          return alert("Houve um erro");
+        }
+      })
 
       setFornecedores(
         fornecedores.map((f) =>
@@ -201,7 +216,9 @@ export default function FornecedoresPage() {
         })
         .then((data) => {
           const newFornecedor = {
-            ...formData,
+            ...
+            formData,
+            id: data.criado,
             ativo: true,
           };
           setFornecedores([...fornecedores, newFornecedor]);
@@ -223,7 +240,7 @@ export default function FornecedoresPage() {
     }
     setFornecedores(fornecedores.filter((f) => f.id !== id));
   };
-  
+
   if (!user) return null;
 
   return (

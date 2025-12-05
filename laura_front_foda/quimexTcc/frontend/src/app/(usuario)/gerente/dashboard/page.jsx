@@ -1,4 +1,3 @@
-// app/gerente/page.jsx
 import React from 'react';
 import {
   TrendingUp,
@@ -10,23 +9,22 @@ import {
   ArrowDownRight,
   MoreHorizontal
 } from 'lucide-react';
- 
+
 export default function Dashboard() {
   return (
-    <div className="space-y-8 animate-in fade-in duration-500">
-     
+    <div className="space-y-8 animate-in fade-in duration-500 dark:bg-[#121212]">
       {/* Cabeçalho com Saudação e Data */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-[#20532A]">Visão Geral</h1>
-          <p className="text-gray-500 mt-1">Bem-vindo! Aqui está uma visão geral sobre sua loja hoje.</p>
+          <h1 className="text-3xl font-bold text-[#20532A] dark:text-[#BEE2B9]">Visão Geral</h1>
+          <p className="text-gray-500 mt-1 dark:text-gray-400">Bem-vindo! Aqui está uma visão geral sobre sua loja hoje.</p>
         </div>
-        <div className="flex items-center gap-3 bg-white px-4 py-2 rounded-full shadow-sm border border-gray-100 text-sm font-medium text-[#20532A]">
-          <Clock size={16} className="text-[#2EAF4A]" />
+        <div className="flex items-center gap-3 bg-[#2EAF4A] dark:bg-[#3C5A3B] px-4 py-2 rounded-full shadow-sm border border-gray-100 dark:border-gray-600 text-sm font-medium text-[#BEE2B9]">
+          <Clock size={16} className="text-[#BEE2B9]" />
           <span>Loja Aberta • Fecha às 22:00</span>
         </div>
       </div>
- 
+
       {/* Grid de KPIs - Design "Glass" e Gradientes */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <KpiCard
@@ -49,7 +47,7 @@ export default function Dashboard() {
           title="Saldo em Caixa"
           value="R$ 1.850,00"
           subtext="Aberto com R$ 200,00"
-          icon={Package} // Usando Package como ícone genérico de caixa/estoque se preferir
+          icon={Package}
           color="white"
         />
         <KpiCard
@@ -61,37 +59,36 @@ export default function Dashboard() {
           color="white"
         />
       </div>
- 
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Seção Principal: Gráfico Premium */}
-        <div className="lg:col-span-2 bg-white rounded-3xl p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 relative overflow-hidden">
+        <div className="lg:col-span-2 bg-[#F5F5F5] dark:bg-[#121212] rounded-3xl p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 dark:border-gray-600 relative overflow-hidden">
           <div className="flex justify-between items-center mb-8 relative z-10">
             <div>
-              <h3 className="text-xl font-bold text-[#20532A]">Performance de Vendas</h3>
-              <p className="text-sm text-gray-400">Comparativo com semana anterior</p>
+              <h3 className="text-xl font-bold text-[#20532A] dark:text-[#BEE2B9]">Performance de Vendas</h3>
+              <p className="text-sm text-gray-400 dark:text-gray-500">Comparativo com semana anterior</p>
             </div>
-            <select className="bg-[#F3F4F6] border-none text-sm font-semibold text-[#20532A] py-2 px-4 rounded-lg focus:ring-2 focus:ring-[#2EAF4A]">
+            <select className="bg-[#2EAF4A] dark:bg-[#20532A] border-none text-sm font-semibold text-[#BEE2B9] dark:text-[#BEE2B9] py-2 px-4 rounded-lg focus:ring-2 focus:ring-[#2EAF4A]">
               <option>Esta Semana</option>
               <option>Este Mês</option>
             </select>
           </div>
- 
+
           {/* Componente de Gráfico SVG Customizado (Bonito e Curvo) */}
           <div className="h-72 w-full relative z-10">
             <SmoothAreaChart />
           </div>
- 
+
           {/* Decoração de Fundo */}
-          <div className="absolute top-0 right-0 w-64 h-64 bg-[#BEE2B9] rounded-full blur-3xl opacity-20 -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
+          <div className="absolute top-0 right-0 w-64 h-64 bg-[#BEE2B9] dark:bg-[#20532A] rounded-full blur-3xl opacity-20 -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
         </div>
- 
+
         {/* Coluna Lateral: Alertas e Top Produtos */}
         <div className="space-y-8">
-         
           {/* Alertas Importantes */}
-          <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
-            <h3 className="text-lg font-bold text-[#20532A] mb-4 flex items-center gap-2">
-              <div className="w-2 h-6 bg-[#2EAF4A] rounded-full"></div>
+          <div className="bg-white dark:bg-[#20532A] rounded-3xl p-6 shadow-sm border border-gray-100 dark:border-gray-700">
+            <h3 className="text-lg font-bold text-[#BEE2B9] mb-4 flex items-center gap-2">
+              <div className="w-2 h-6 bg-[#BEE2B9] text-[#20532A] dark:text-white rounded-full"></div>
               Atenção Necessária
             </h3>
             <div className="space-y-3">
@@ -107,13 +104,12 @@ export default function Dashboard() {
               />
             </div>
           </div>
- 
+
           {/* Produtos Mais Vendidos com Barras de Progresso */}
-          <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
+          <div className="bg-white dark:bg-[#20532A] rounded-3xl p-6 shadow-sm border border-gray-100 dark:border-gray-700">
             <div className="flex justify-between items-center mb-6">
-              <h3 className="text-lg font-bold text-[#20532A]">Top Produtos</h3>
-              <button className="text-[#1B8742] text-sm font-medium hover:underline">Ver todos</button>
-            </div>
+              <h3 className="text-lg font-bold text-[#20532A] dark:text-white">Top Produtos</h3>
+             </div>
             <div className="space-y-5">
               <ProductRow
                 rank={1}
@@ -138,26 +134,25 @@ export default function Dashboard() {
               />
             </div>
           </div>
- 
         </div>
       </div>
     </div>
   );
 }
- 
+
 /* --- COMPONENTES VISUAIS RICOS --- */
- 
+
 // 1. Card KPI com suporte a variantes visuais
 function KpiCard({ title, value, trend, trendUp, subtext, icon: Icon, color }) {
   // Configuração de cores baseada na prop 'color'
   const isDark = color === 'dark';
   const isLight = color === 'light';
- 
-  let containerClass = "bg-white border-gray-100 text-gray-800";
-  let iconBgClass = "bg-[#F3F4F6] text-[#20532A]";
-  let titleClass = "text-gray-500";
-  let valueClass = "text-[#20532A]";
- 
+
+  let containerClass = "bg-white dark:bg-[#20532A] border-gray-100 dark:border-gray-700 text-gray-800 dark:text-white";
+  let iconBgClass = "bg-[#F3F4F6] dark:bg-[#20532A] text-[#20532A] dark:text-white";
+  let titleClass = "text-gray-500 dark:text-gray-400";
+  let valueClass = "text-[#20532A] dark:text-white";
+
   if (isDark) {
     // Gradiente Verde Escuro Luxuoso
     containerClass = "bg-gradient-to-br from-[#20532A] to-[#1B8742] text-white border-transparent shadow-lg shadow-[#20532A]/20";
@@ -171,7 +166,7 @@ function KpiCard({ title, value, trend, trendUp, subtext, icon: Icon, color }) {
     titleClass = "text-[#1B8742]";
     valueClass = "text-[#20532A]";
   }
- 
+
   return (
     <div className={`p-6 rounded-3xl border transition-all duration-300 hover:-translate-y-1 hover:shadow-lg ${containerClass}`}>
       <div className="flex justify-between items-start mb-4">
@@ -197,7 +192,7 @@ function KpiCard({ title, value, trend, trendUp, subtext, icon: Icon, color }) {
     </div>
   );
 }
- 
+
 // 2. Card de Alerta com Iconografia Distinta
 function AlertCard({ type, title, desc }) {
   const isCritical = type === 'critical';
@@ -219,25 +214,25 @@ function AlertCard({ type, title, desc }) {
     </div>
   );
 }
- 
+
 // 3. Linha de Produto com Barra de Progresso Visual
 function ProductRow({ rank, name, sales, price, percent }) {
   return (
     <div className="group">
       <div className="flex justify-between items-end mb-1">
         <div className="flex items-center gap-3">
-          <span className="flex items-center justify-center w-6 h-6 rounded bg-[#F3F4F6] text-xs font-bold text-gray-400 group-hover:bg-[#20532A] group-hover:text-white transition-colors">
+          <span className="flex items-center justify-center w-6 h-6 rounded bg-[#F3F4F6] dark:bg-[#20532A] text-xs font-bold text-gray-400 group-hover:bg-[#20532A] group-hover:text-white transition-colors">
             {rank}
           </span>
           <div>
-            <p className="text-sm font-bold text-gray-800">{name}</p>
-            <p className="text-xs text-gray-400">{sales}</p>
+            <p className="text-sm font-bold text-gray-800 dark:text-white">{name}</p>
+            <p className="text-xs text-gray-400 dark:text-gray-300">{sales}</p>
           </div>
         </div>
-        <span className="text-sm font-semibold text-[#1B8742]">{price}</span>
+        <span className="text-sm font-semibold text-[#1B8742] dark:text-[#BEE2B9]">{price}</span>
       </div>
       {/* Barra de Progresso Fundo */}
-      <div className="w-full h-1.5 bg-gray-100 rounded-full mt-2 overflow-hidden">
+      <div className="w-full h-1.5 bg-gray-100 dark:bg-gray-600 rounded-full mt-2 overflow-hidden">
         <div
           className="h-full bg-gradient-to-r from-[#20532A] to-[#2EAF4A] rounded-full transition-all duration-1000 group-hover:shadow-[0_0_10px_#2EAF4A]"
           style={{ width: `${percent}%` }}
@@ -246,7 +241,7 @@ function ProductRow({ rank, name, sales, price, percent }) {
     </div>
   );
 }
- 
+
 // 4. Gráfico de Área Suave (SVG Puro sem bibliotecas)
 function SmoothAreaChart() {
   // Simulação de dados para a curva
@@ -299,7 +294,7 @@ function SmoothAreaChart() {
       </g>
  
       {/* Eixo X (Dias) */}
-      <g className="text-muted text-xs font-medium" style={{ transform: 'translateY(290px)' }}>
+      <g className="text-muted text-xs font-medium text-[#20532A] dark:text-white" style={{ transform: 'translateY(290px)' }}>
         <text x="50" textAnchor="middle">SEG</text>
         <text x="166" textAnchor="middle">TER</text>
         <text x="282" textAnchor="middle">QUA</text>
@@ -311,4 +306,3 @@ function SmoothAreaChart() {
     </svg>
   );
 }
- 

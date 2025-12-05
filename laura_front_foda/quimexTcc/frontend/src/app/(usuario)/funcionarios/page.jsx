@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useMemo, useEffect } from "react"
-// import { useAuth } from "@/app/contexts/auth-context"
+import { useAuth } from "@/app/contexts/auth-context";
 import { mockUsers, mockLojas } from "@/lib/mock-data"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"

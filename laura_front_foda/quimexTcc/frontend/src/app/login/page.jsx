@@ -5,6 +5,17 @@ import { useRouter } from "next/navigation"
 import { User, Lock, ChevronDown } from "lucide-react"
 import { DotLottieReact } from "@lottiefiles/dotlottie-react"
 import Link from "next/link"
+
+import { Label } from "@/components/ui/label"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  SelectLabel,
+  SelectGroup
+} from "@/components/ui/select";
  
 export default function LoginPage() {
   const router = useRouter()
@@ -25,8 +36,6 @@ export default function LoginPage() {
     e.preventDefault()
     setError("")
     setLoading(true)
-
-    console.log( RE, password, profile )
  
     const res = await fetch(`http://localhost:8080/login`, {
       method: "POST", // HTTP method
@@ -53,7 +62,7 @@ export default function LoginPage() {
     }
     else{
       setLoading(false);
-      router.push("/");
+   
     }
 
     const data = await res.json();
@@ -62,7 +71,7 @@ export default function LoginPage() {
       window.location.href = "admin/dashboard";
     } else if (data.cargo == "Gerente") {
       window.location.href = "gerente/dashboard";
-    } else if (data.cargo == "Vendedor") {
+    } else if (data.cargo == "Funcionario") {
       window.location.href = "vendedor/pdv";
     }
    
@@ -198,25 +207,19 @@ export default function LoginPage() {
  
               {/* PERFIL */}
               <div className="space-y-2">
-                <div className="relative">
-                  <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-[#279D49]">
-                    <ChevronDown size={18} />
-                  </div>
- 
-                  <select
-                    id="select"
-                    value={profile}
-                    onChange={(e) => setProfile(e.target.value)}
-                    className="h-12 w-full pl-3 pr-10 rounded-lg border transition-all appearance-none outline-none cursor-pointer
-                    bg-white border-[#BEE2B9] text-[#20532A] focus:ring-1 focus:ring-[#279D49]"
-                  >
-                    <option value="" disabled className="text-gray-500">
-                      Escolha o Perfil
-                    </option>
-                    <option value="Administrador">Administrador</option>
-                    <option value="Gerente">Gerente</option>
-                  </select>
-                </div>
+                <Label className="text-[#279D49]">Escolha o perfil</Label>
+                <Select value={profile} onValueChange={setProfile} className="bg-white">
+                  <SelectTrigger className="text-primary bg-white h-12">
+                    <SelectValue placeholder="Selecione o perfil" />
+                  </SelectTrigger>
+                  <SelectGroup>
+                    <SelectContent>
+                    <SelectLabel>Perfil</SelectLabel>
+                    <SelectItem value="Administrador">Administrador</SelectItem>
+                    <SelectItem value="Gerente">Gerente</SelectItem>
+                  </SelectContent>
+                  </SelectGroup>
+                </Select>
               </div>
  
               {/* ERRO */}
@@ -236,7 +239,7 @@ export default function LoginPage() {
               >
                 {loading ? "Entrando..." : "Login"}
               </button>
-              <Link href={'/loginVendedor'}>
+              <Link href={'/areaDoVendedor'}>
               <button
                 type="submit"
                 className={`w-full font-semibold h-12 rounded-lg shadow-lg transition-all 

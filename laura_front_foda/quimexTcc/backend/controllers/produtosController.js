@@ -43,11 +43,11 @@ const criar_produtoController = async (req, res) => {
       classificacao: produto.classificacao,
       fornecedor: produto.fornecedor,
       codigoCor: produto.codigoCor,
-      imagem: capaPath ? capaPath : imagem,
+      imagem: capaPath,
       filial: produto.filial,
     };
     const criado = await criar_produto(data);
-    res.status(200).json({ criado });
+    res.status(200).json({ criado, capaPath });
   } catch (err) {
     console.error("Erro criando produto:", err);
     res
@@ -68,15 +68,16 @@ const atualizar_produtoController = async (req, res) => {
       );
     }
     const antigo = await listar_produtos();
-    console.log(antigo)
     const imagem = antigo.find((e) => e.id == id).imagem;
     if (capaPath) {
-      fs.unlink("C:/quimex_projeto/backend" + imagem, (err) => {
+      const pathToFile = `.${imagem}`;
+
+      fs.unlink(pathToFile, (err) => {
         if (err) {
-          console.error("Erro:", err);
-          return;
+          console.error("Error deleting file:", err);
+        } else {
+          console.log("File deleted!");
         }
-        return;
       });
     }
     const data = {
@@ -92,8 +93,9 @@ const atualizar_produtoController = async (req, res) => {
       imagem: capaPath ? capaPath : imagem,
       filial: produto.filial,
     };
+    const path = capaPath ? capaPath : imagem;
     const atualizado = await atualizar_produto(id, data);
-    res.status(200).json({ atualizado });
+    res.status(200).json({ atualizado, path });
   } catch (err) {
     console.error("Erro atualizando produto:", err);
     res

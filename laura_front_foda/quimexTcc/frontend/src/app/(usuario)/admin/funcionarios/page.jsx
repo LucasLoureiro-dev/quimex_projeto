@@ -1,5 +1,6 @@
 "use client"
 
+import { useRouter } from "next/navigation";
 import { useState, useMemo, useEffect } from "react"
 // import { useAuth } from "@/app/contexts/auth-context"
 import { mockUsers, mockLojas } from "@/lib/mock-data"
@@ -529,12 +530,6 @@ export default function FuncionariosPage() {
         itemsPerPage={10}
       />
 
-      {filteredFuncionarios.length === 0 && (
-        <div className="text-center py-12">
-          <UserCircle className="h-12 w-12 text-muted-foreground mx-auto mb-4 opacity-50" />
-          <p className="text-muted-foreground">Nenhum funcionário encontrado.</p>
-        </div>
-      )}
     </div>
   )
 }

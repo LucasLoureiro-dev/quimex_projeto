@@ -75,7 +75,7 @@ export default function DashboardPage() {
     // Tabela de vendas
     const finalY = doc.lastAutoTable.finalY + 10
     doc.text("Vendas Mensais:", 14, finalY)
-    autoTable(doc, {  // <---- aqui
+    autoTable(doc, { 
       startY: finalY + 5,
       head: [["Mês", "Vendas (R$)"]],
       body: salesData.map((d) => [d.month, `R$ ${d.value.toLocaleString("pt-BR")}`]),
@@ -85,8 +85,8 @@ export default function DashboardPage() {
  
     // Tabela de faturas
     const finalY2 = doc.lastAutoTable.finalY + 10
-    doc.text("Status de Faturas:", 14, finalY2)
-    autoTable(doc, {  // <---- aqui
+    doc.text("Estoque mensal:", 14, finalY2)
+    autoTable(doc, {  
       startY: finalY2 + 5,
       head: [["Status", "Quantidade"]],
       body: invoiceData.map((d) => [d.name, d.value]),
@@ -274,9 +274,9 @@ export default function DashboardPage() {
  
           <div className="grid grid-cols-2 gap-4">
             {[
-              { title: "Produtos", icon: Package, action: () => router.push("/dashboard/produtos") },
-              { title: "Financeiro", icon: TrendingUp, action: () => router.push("/dashboard/financeiro") },
-              { title: "Fornecedores", icon: Factory, action: () => router.push("/dashboard/fornecedores") },
+              { title: "Produtos", icon: Package, action: () => router.push("/admin/produtos") },
+              { title: "Financeiro", icon: TrendingUp, action: () => router.push("/admin/financeiro") },
+              { title: "Fornecedores", icon: Factory, action: () => router.push("/admin/fornecedores") },
               { title: "Relatórios", icon: FileText, action: handleDownloadReport },
             ].map(({ title, icon: Icon, action }) => (
               <button

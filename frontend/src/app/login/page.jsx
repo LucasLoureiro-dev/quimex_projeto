@@ -9,6 +9,14 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Alert, AlertDescription } from "@/components/ui/alert"
+
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
  
 export default function LoginPage() {
   const router = useRouter()
@@ -207,36 +215,17 @@ export default function LoginPage() {
  
             {/* Campo Perfil */}
             <div className="space-y-2">
-              <Label
-                htmlFor="profile"
-                className={`text-sm font-medium ${theme === "dark" ? "text-slate-300" : "text-slate-700"
-                  }`}
-              >
-                Selecione o seu perfil:
-              </Label>
-              <Select value={profile} onValueChange={setProfile}>
-                <SelectTrigger
-                  id="profile"
-                  className={`h-12 rounded-lg transition-all duration-200 ${theme === "dark"
-                      ? "bg-slate-950/50 border-slate-800 text-slate-200"
-                      : "bg-slate-50 border-slate-300 text-slate-900"
-                    } focus:border-blue-600 focus:ring-blue-600/20`}
-                >
-                  <SelectValue placeholder="Escolha" />
-                </SelectTrigger>
-                <SelectContent
-                  className={
-                    theme === "dark"
-                      ? "bg-slate-900 border-slate-800"
-                      : "bg-white border-slate-200"
-                  }
-                >
-                  <SelectItem value="Administrador">Administrador</SelectItem>
-                  <SelectItem value="Gerente">Gerente</SelectItem>
-                  <SelectItem value="Vendedor">Vendedor</SelectItem>
+                <Label>Escolha o perfil</Label>
+                <Select value={profile} onValueChange={setProfile} className="bg-white">
+                  <SelectTrigger className="text-primary bg-white h-12">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Administrador">Administrador</SelectItem>
+                    <SelectItem value="Gerente">Gerente</SelectItem>
                   </SelectContent>
-              </Select>
-            </div>
+                </Select>
+              </div>
  
             {/* Erro */}
             {error && (

@@ -141,6 +141,11 @@ export default function Tabela({data}) {
     //usuarios do mockUsers
     data,
     columns,
+    initialState: {
+      pagination: {
+        pageSize: 4, 
+      },
+    },
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),

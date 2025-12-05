@@ -1,7 +1,8 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useState, useMemo, useEffect } from "react";
-// import { useAuth } from "@/app/contexts/auth-context";
+import { useAuth } from "@/app/contexts/auth-context";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -33,9 +34,16 @@ import {
 
 //paginacao
 import { ControlePaginacao } from "@/components/paginacao/controlePaginacao";
-import { CardLojas }  from "@/components/cards/cardLojas";
+import { CardLojas } from "@/components/cards/cardLojas";
 
 export default function LojasPage() {
+  const { user, isLoading } = useAuth();
+  const router = useRouter();
+  useEffect(() => {
+    if (!isLoading && !user) {
+      router.push("/login");
+    }
+  }, [user, isLoading, router]);
   const [lojas, setLojas] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -81,7 +89,7 @@ export default function LojasPage() {
 
   const handleSaveLoja = async () => {
     if (editingLoja) {
-      console.log(editingLoja)
+      console.log(editingLoja);
 
       await fetch(`http://localhost:8080/lojas/${editingLoja.id}`, {
         method: "PUT",

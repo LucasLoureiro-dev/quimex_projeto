@@ -1,6 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/app/contexts/auth-context";
+import React, { useState, useEffect } from "react";
 import {
   Search,
   Filter,
@@ -10,727 +12,402 @@ import {
   Smartphone,
   Plus,
   Minus,
+  Hexagon,
+  FlaskConical,
+  Palette,
+  Check,
 } from "lucide-react";
 
+const hexToRgb = (hex) => {
+  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  return result
+    ? {
+        r: parseInt(result[1], 16),
+        g: parseInt(result[2], 16),
+        b: parseInt(result[3], 16),
+      }
+    : { r: 255, g: 255, b: 255 };
+};
 
-// ================================
-// Lista de produtos químicos - COMPLETA 
-// ================================
-const chemicalProducts = [
-  {
-    id: "1",
-    code: "QMX-001",
-    name: "Ácido Sulfúrico 98%",
-    price: 45.9,
-    category: "Ácidos Inorgânicos",
-    colorCode: "bg-orange-600",
-    image: "/produtos/sulfuric-acid-bottle.jpg",
-  },
-  {
-    id: "2",
-    code: "QMX-002",
-    name: "Hidróxido de Sódio",
-    price: 32.5,
-    category: "Bases",
-    colorCode: "bg-green-700",
-    image: "/produtos/sodium-hydroxide-bottle.jpg",
-  },
-  {
-    id: "3",
-    code: "QMX-003",
-    name: "Álcool Etílico 99.5%",
-    price: 28.9,
-    category: "Inflamáveis",
-    colorCode: "bg-red-600",
-    image: "/produtos/ethanol-bottle.jpg",
-  },
-  {
-    id: "4",
-    code: "QMX-004",
-    name: "Acetona PA",
-    price: 35.0,
-    category: "Inflamáveis",
-    colorCode: "bg-red-600",
-    image: "/produtos/acetone-bottle.jpg",
-  },
-  {
-    id: "5",
-    code: "QMX-005",
-    name: "Cloreto de Sódio",
-    price: 15.9,
-    category: "Químicos Gerais",
-    colorCode: "bg-gray-200",
-    image: "/produtos/sodium-chloride-bottle.jpg",
-  },
-  {
-    id: "6",
-    code: "QMX-006",
-    name: "Peróxido de Hidrogênio",
-    price: 22.5,
-    category: "Oxidantes",
-    colorCode: "bg-lime-500",
-    image: "/produtos/hydrogen-peroxide-bottle.jpg",
-  },
-  {
-    id: "7",
-    code: "QMX-007",
-    name: "Ácido Clorídrico 37%",
-    price: 38.9,
-    category: "Ácidos Inorgânicos",
-    colorCode: "bg-orange-600",
-    image: "/produtos/hydrochloric-acid-bottle.jpg",
-  },
-  {
-    id: "8",
-    code: "QMX-008",
-    name: "Carbonato de Cálcio",
-    price: 18.5,
-    category: "Químicos Gerais",
-    colorCode: "bg-gray-200",
-    image: "/produtos/calcium-carbonate-bottle.jpg",
-  },
+const rgbToHex = (r, g, b) => {
+  const toHex = (c) => {
+    const hex = Math.max(0, Math.min(255, Number(c))).toString(16);
+    return hex.length === 1 ? "0" + hex : hex;
+  };
+  return "#" + toHex(r) + toHex(g) + toHex(b);
+};
 
-  // --- Produtos da Agroindústria ---
-  {
-    id: "9",
-    code: "AGRO-001",
-    name: "Ácido Bórico",
-    price: 40.0,
-    category: "Tóxicos", // Uso condicionado devido à toxicidade
-    colorCode: "bg-purple-600", // Roxo
-    image: "/placeholder-chemical-bottle.jpg",
-  },
-  {
-    id: "10",
-    code: "AGRO-002",
-    name: "Ácido Cítrico",
-    price: 25.0,
-    category: "Ácidos Orgânicos",
-    colorCode: "bg-yellow-500", // Amarelo
-    image: "/placeholder-chemical-bottle.jpg",
-  },
-  // Ácido Clorídrico (já existe, mas garantindo que esteja na categoria certa)
-  // { id: "11", code: "AGRO-003", name: "Ácido Clorídrico", price: 38.9, category: "Ácidos Inorgânicos", colorCode: "bg-orange-600", image: "/hydrochloric-acid-bottle.jpg" },
-  {
-    id: "12",
-    code: "AGRO-004",
-    name: "Ácido Fosfórico (alimentício)",
-    price: 55.0,
-    category: "Ácidos Inorgânicos",
-    colorCode: "bg-orange-600",
-    image: "/placeholder-chemical-bottle.jpg",
-  },
-  {
-    id: "13",
-    code: "AGRO-005",
-    name: "Ácido Nítrico",
-    price: 60.0,
-    category: "Ácidos Inorgânicos Oxidantes/Manuseio Especial",
-    colorCode: "bg-blue-600", // Azul
-    image: "/placeholder-chemical-bottle.jpg",
-  },
-  // Ácido Sulfúrico (já existe)
-  {
-    id: "14",
-    code: "AGRO-006",
-    name: "Basefloc (Agente Floculante)",
-    price: 80.0,
-    category: "Químicos Gerais", // Agente de tratamento, uso condicionado
-    colorCode: "bg-gray-200",
-    image: "/placeholder-chemical-bottle.jpg",
-  },
-  {
-    id: "15",
-    code: "AGRO-007",
-    name: "Borax (Tetraborato de Sódio)",
-    price: 30.0,
-    category: "Tóxicos", // Uso restrito por toxicidade
-    colorCode: "bg-purple-600",
-    image: "/placeholder-chemical-bottle.jpg",
-  },
-  {
-    id: "16",
-    code: "AGRO-008",
-    name: "Cloreto Férrico",
-    price: 48.0,
-    category: "Ácidos Inorgânicos Oxidantes/Manuseio Especial", // Tratamento de água
-    colorCode: "bg-blue-600",
-    image: "/placeholder-chemical-bottle.jpg",
-  },
-  {
-    id: "17",
-    code: "AGRO-009",
-    name: "Enxofre",
-    price: 20.0,
-    category: "Químicos Gerais", // Fungicida, fertilizante
-    colorCode: "bg-gray-200",
-    image: "/placeholder-chemical-bottle.jpg",
-  },
-  {
-    id: "18",
-    code: "AGRO-010",
-    name: "Formaldeído",
-    price: 42.0,
-    category: "Tóxicos", // Proibido/Restrito por toxicidade
-    colorCode: "bg-purple-600",
-    image: "/placeholder-chemical-bottle.jpg",
-  },
-  {
-    id: "19",
-    code: "AGRO-011",
-    name: "Hidróxido de Potássio",
-    price: 37.0,
-    category: "Bases",
-    colorCode: "bg-green-700",
-    image: "/placeholder-chemical-bottle.jpg",
-  },
-  // Hidróxido de Sódio (já existe)
-  {
-    id: "20",
-    code: "AGRO-012",
-    name: "Hipoclorito de Sódio",
-    price: 18.0,
-    category: "Oxidantes", // Desinfetante, alvejante
-    colorCode: "bg-lime-500",
-    image: "/placeholder-chemical-bottle.jpg",
-  },
-  {
-    id: "21",
-    code: "AGRO-013",
-    name: "Metabissulfito de Sódio",
-    price: 28.0,
-    category: "Químicos Gerais", // Conservante/antioxidante
-    colorCode: "bg-gray-200",
-    image: "/placeholder-chemical-bottle.jpg",
-  },
-  // Peróxido de Hidrogênio (já existe)
-  {
-    id: "22",
-    code: "AGRO-014",
-    name: "Sulfato de Alumínio Ferroso",
-    price: 52.0,
-    category: "Químicos Gerais", // Tratamento de água
-    colorCode: "bg-gray-200",
-    image: "/placeholder-chemical-bottle.jpg",
-  },
-  {
-    id: "23",
-    code: "AGRO-015",
-    name: "Sulfato de Amônia",
-    price: 22.0,
-    category: "Químicos Gerais", // Fertilizante
-    colorCode: "bg-gray-200",
-    image: "/placeholder-chemical-bottle.jpg",
-  },
-  {
-    id: "24",
-    code: "AGRO-016",
-    name: "Sulfato de Zinco",
-    price: 33.0,
-    category: "Químicos Gerais", // Micronutriente
-    colorCode: "bg-gray-200",
-    image: "/placeholder-chemical-bottle.jpg",
-  },
-  {
-    id: "25",
-    code: "AGRO-017",
-    name: "Ureia",
-    price: 16.0,
-    category: "Químicos Gerais", // Fertilizante
-    colorCode: "bg-gray-200",
-    image: "/placeholder-chemical-bottle.jpg",
-  },
+const PaintMixerModal = ({ onClose, onConfirm }) => {
+  const [color, setColor] = useState("#117540"); // Começa com o verde Quimex
+  const [rgb, setRgb] = useState({ r: 17, g: 117, b: 64 });
 
-  // --- Produtos da Indústria de Transformação ---
-  // Ácido Sulfúrico (já existe)
-  // Hidróxido de Sódio (já existe)
-  // Acetona (já existe)
-  {
-    id: "26",
-    code: "TRANS-001",
-    name: "Tolueno",
-    price: 45.0,
-    category: "Inflamáveis", // Solvente orgânico
-    colorCode: "bg-red-600",
-    image: "/placeholder-chemical-bottle.jpg",
-  },
-  {
-    id: "27",
-    code: "TRANS-002",
-    name: "Etanol (Industrial)",
-    price: 29.0,
-    category: "Inflamáveis",
-    colorCode: "bg-red-600",
-    image: "/placeholder-chemical-bottle.jpg",
-  },
-  {
-    id: "28",
-    code: "TRANS-003",
-    name: "Isopropanol",
-    price: 38.0,
-    category: "Inflamáveis",
-    colorCode: "bg-red-600",
-    image: "/placeholder-chemical-bottle.jpg",
-  },
-  {
-    id: "29",
-    code: "TRANS-004",
-    name: "Polietileno (PE) Granulado",
-    price: 75.0,
-    category: "Químicos Gerais", // Polímero, matéria-prima
-    colorCode: "bg-gray-200",
-    image: "/placeholder-raw-material.jpg",
-  },
-  {
-    id: "30",
-    code: "TRANS-005",
-    name: "Resina Epóxi",
-    price: 120.0,
-    category: "Químicos Gerais", // Resina termofixa
-    colorCode: "bg-gray-200",
-    image: "/placeholder-resin.jpg",
-  },
-  {
-    id: "31",
-    code: "TRANS-006",
-    name: "Plastificante DOP",
-    price: 90.0,
-    category: "Químicos Gerais", // Aditivo para plásticos
-    colorCode: "bg-gray-200",
-    image: "/placeholder-chemical-bottle.jpg",
-  },
-  {
-    id: "32",
-    code: "TRANS-007",
-    name: "Antioxidante BHT",
-    price: 65.0,
-    category: "Químicos Gerais", // Aditivo químico
-    colorCode: "bg-gray-200",
-    image: "/placeholder-chemical-bottle.jpg",
-  },
-  {
-    id: "33",
-    code: "TRANS-008",
-    name: "Dióxido de Titânio (Pigmento)",
-    price: 88.0,
-    category: "Químicos Gerais", // Pigmento
-    colorCode: "bg-gray-200",
-    image: "/placeholder-pigment.jpg",
-  },
-  {
-    id: "34",
-    code: "TRANS-009",
-    name: "Lauril Éter Sulfato de Sódio",
-    price: 50.0,
-    category: "Químicos Gerais", // Tensoativo
-    colorCode: "bg-gray-200",
-    image: "/placeholder-chemical-bottle.jpg",
-  },
-  {
-    id: "35",
-    code: "TRANS-010",
-    name: "Catalisador para Polímeros",
-    price: 150.0,
-    category: "Químicos Gerais", // Catalisador
-    colorCode: "bg-gray-200",
-    image: "/placeholder-chemical-bottle.jpg",
-  },
-  // Peróxido de Hidrogênio (já existe)
-  // Metabissulfito de Sódio (já existe)
-  {
-    id: "36",
-    code: "TRANS-011",
-    name: "PAC (Policloreto de Alumínio)",
-    price: 60.0,
-    category: "Químicos Gerais", // Coagulante/Floculante
-    colorCode: "bg-gray-200",
-    image: "/placeholder-chemical-bottle.jpg",
-  },
-  {
-    id: "37",
-    code: "TRANS-012",
-    name: "Óleo Lubrificante Industrial",
-    price: 70.0,
-    category: "Químicos Gerais", // Lubrificante
-    colorCode: "bg-gray-200",
-    image: "/placeholder-oil.jpg",
-  },
-  {
-    id: "38",
-    code: "TRANS-013",
-    name: "Agente Antiespumante",
-    price: 85.0,
-    category: "Químicos Gerais", // Antiespumante
-    colorCode: "bg-gray-200",
-    image: "/placeholder-chemical-bottle.jpg",
-  },
-  {
-    id: "39",
-    code: "TRANS-014",
-    name: "Carbonato de Cálcio (Carga Mineral)",
-    price: 25.0,
-    category: "Químicos Gerais", // Carga mineral
-    colorCode: "bg-gray-200",
-    image: "/placeholder-raw-material.jpg",
-  },
-  {
-    id: "40",
-    code: "TRANS-015",
-    name: "Agente de Cura para Resinas",
-    price: 95.0,
-    category: "Químicos Gerais", // Agente de cura
-    colorCode: "bg-gray-200",
-    image: "/placeholder-chemical-bottle.jpg",
-  },
-  {
-    id: "41",
-    code: "TRANS-016",
-    name: "Cloreto de Metileno",
-    price: 58.0,
-    category: "Tóxicos", // Composto halogenado, solvente
-    colorCode: "bg-purple-600",
-    image: "/placeholder-chemical-bottle.jpg",
-  },
-  {
-    id: "42",
-    code: "TRANS-017",
-    name: "Aditivo Antiestático",
-    price: 72.0,
-    category: "Químicos Gerais", // Aditivo
-    colorCode: "bg-gray-200",
-    image: "/placeholder-chemical-bottle.jpg",
-  },
-  {
-    id: "43",
-    code: "TRANS-018",
-    name: "Dimeticona (Silicone)",
-    price: 110.0,
-    category: "Químicos Gerais", // Silicone
-    colorCode: "bg-gray-200",
-    image: "/placeholder-chemical-bottle.jpg",
-  },
-  {
-    id: "44",
-    code: "TRANS-019",
-    name: "Biocida Isotiazolinona",
-    price: 80.0,
-    category: "Tóxicos", // Biocida
-    colorCode: "bg-purple-600",
-    image: "/placeholder-chemical-bottle.jpg",
-  },
+  const handleHexChange = (e) => {
+    const newHex = e.target.value;
+    setColor(newHex);
+    setRgb(hexToRgb(newHex));
+  };
 
-  // --- Produtos da Indústria Farmacêutica & Cosmética ---
-  {
-    id: "45",
-    code: "FARMA-001",
-    name: "Lactose Monohidratada",
-    price: 40.0,
-    category: "Químicos Gerais", // Excipiente
-    colorCode: "bg-gray-200",
-    image: "/placeholder-raw-material.jpg",
-  },
-  {
-    id: "46",
-    code: "FARMA-002",
-    name: "Celulose Microcristalina",
-    price: 45.0,
-    category: "Químicos Gerais", // Excipiente
-    colorCode: "bg-gray-200",
-    image: "/placeholder-raw-material.jpg",
-  },
-  {
-    id: "47",
-    code: "FARMA-003",
-    name: "Lauril Sulfato de Sódio (LSS)",
-    price: 35.0,
-    category: "Químicos Gerais", // Surfactante
-    colorCode: "bg-gray-200",
-    image: "/placeholder-chemical-bottle.jpg",
-  },
-  {
-    id: "48",
-    code: "FARMA-004",
-    name: "Carbopol 940 (Espessante)",
-    price: 70.0,
-    category: "Químicos Gerais", // Espessante
-    colorCode: "bg-gray-200",
-    image: "/placeholder-raw-material.jpg",
-  },
-  {
-    id: "49",
-    code: "FARMA-005",
-    name: "Propilenoglicol",
-    price: 30.0,
-    category: "Químicos Gerais", // Solvente
-    colorCode: "bg-gray-200",
-    image: "/placeholder-chemical-bottle.jpg",
-  },
-  {
-    id: "50",
-    code: "FARMA-006",
-    name: "Glicerina Bi-destilada",
-    price: 28.0,
-    category: "Químicos Gerais", // Solvente/Umectante
-    colorCode: "bg-gray-200",
-    image: "/placeholder-chemical-bottle.jpg",
-  },
-  {
-    id: "51",
-    code: "FARMA-007",
-    name: "Fenoxietanol (Conservante)",
-    price: 60.0,
-    category: "Químicos Gerais", // Conservante
-    colorCode: "bg-gray-200",
-    image: "/placeholder-chemical-bottle.jpg",
-  },
-  // Ácido Cítrico (já existe)
-  {
-    id: "52",
-    code: "FARMA-008",
-    name: "Ácido Lático",
-    price: 42.0,
-    category: "Ácidos Orgânicos",
-    colorCode: "bg-yellow-500",
-    image: "/placeholder-chemical-bottle.jpg",
-  },
-  // Hidróxido de Sódio (já existe)
-  {
-    id: "53",
-    code: "FARMA-009",
-    name: "Vitamina E (Tocoferol)",
-    price: 85.0,
-    category: "Químicos Gerais", // Antioxidante
-    colorCode: "bg-gray-200",
-    image: "/placeholder-chemical-bottle.jpg",
-  },
-  {
-    id: "54",
-    code: "FARMA-010",
-    name: "Óleo de Amêndoas Doces (Emoliente)",
-    price: 50.0,
-    category: "Químicos Gerais", // Emoliente
-    colorCode: "bg-gray-200",
-    image: "/placeholder-oil.jpg",
-  },
-  {
-    id: "55",
-    code: "FARMA-011",
-    name: "Sorbitol (Umectante)",
-    price: 25.0,
-    category: "Químicos Gerais", // Umectante
-    colorCode: "bg-gray-200",
-    image: "/placeholder-chemical-bottle.jpg",
-  },
-  // Dióxido de Titânio (já existe)
-  {
-    id: "56",
-    code: "FARMA-012",
-    name: "Óxido de Zinco (Filtro UV)",
-    price: 55.0,
-    category: "Químicos Gerais", // Filtro UV
-    colorCode: "bg-gray-200",
-    image: "/placeholder-raw-material.jpg",
-  },
-  {
-    id: "57",
-    code: "FARMA-013",
-    name: "Essência Floral (Fragrância)",
-    price: 75.0,
-    category: "Químicos Gerais", // Fragrância
-    colorCode: "bg-gray-200",
-    image: "/placeholder-fragrance.jpg",
-  },
-  // Dimeticona (já existe)
-  {
-    id: "58",
-    code: "FARMA-014",
-    name: "Vitamina C (Ácido Ascórbico)",
-    price: 90.0,
-    category: "Ácidos Orgânicos", // Vitamina funcional
-    colorCode: "bg-yellow-500",
-    image: "/placeholder-raw-material.jpg",
-  },
-  {
-    id: "59",
-    code: "FARMA-015",
-    name: "Ácido Salicílico",
-    price: 50.0,
-    category: "Ácidos Orgânicos", // Queratolítico
-    colorCode: "bg-yellow-500",
-    image: "/placeholder-chemical-bottle.jpg",
-  },
-  // Ureia (já existe)
-  {
-    id: "60",
-    code: "FARMA-016",
-    name: "EDTA Dissódico (Quelante)",
-    price: 48.0,
-    category: "Químicos Gerais", // Agente quelante
-    colorCode: "bg-gray-200",
-    image: "/placeholder-raw-material.jpg",
-  },
-  {
-    id: "61",
-    code: "FARMA-017",
-    name: "Creme Base Neutra",
-    price: 38.0,
-    category: "Químicos Gerais", // Base cosmética
-    colorCode: "bg-gray-200",
-    image: "/placeholder-cream-base.jpg",
-  },
-  {
-    id: "62",
-    code: "FARMA-018",
-    name: "Cocamidopropil Betaína",
-    price: 40.0,
-    category: "Químicos Gerais", // Agente espumante
-    colorCode: "bg-gray-200",
-    image: "/placeholder-chemical-bottle.jpg",
-  },
-  {
-    id: "63",
-    code: "FARMA-019",
-    name: "Ibuprofeno em Pó (API)",
-    price: 180.0,
-    category: "Químicos Gerais", // API
-    colorCode: "bg-gray-200",
-    image: "/placeholder-raw-material.jpg",
-  },
-  {
-    id: "64",
-    code: "FARMA-020",
-    name: "Ácido Hialurônico (Grau Cosmético)",
-    price: 250.0,
-    category: "Químicos Gerais", // Agente umectante cutâneo
-    colorCode: "bg-gray-200",
-    image: "/placeholder-raw-material.jpg",
-  },
+  const handleRgbChange = (key, value) => {
+    const newRgb = { ...rgb, [key]: parseInt(value) || 0 };
+    setRgb(newRgb);
+    setColor(rgbToHex(newRgb.r, newRgb.g, newRgb.b));
+  };
 
-  // --- Produtos da Indústria de Limpeza e Saneamento ---
-  // Ácido Clorídrico (já existe)
-  // Ácido Fosfórico (já existe)
-  // Ácido Nítrico (já existe)
-  // Ácido Sulfúrico (já existe)
-  {
-    id: "65",
-    code: "LIMPEZA-001",
-    name: "Barrilha Leve (Carbonato de Sódio)",
-    price: 22.0,
-    category: "Bases", // Usado em detergentes, controle de pH
-    colorCode: "bg-green-700",
-    image: "/placeholder-raw-material.jpg",
-  },
-  // PAC (Policloreto de Alumínio) (já existe)
-  {
-    id: "66",
-    code: "LIMPEZA-002",
-    name: "Bifluoreto de Amônio",
-    price: 55.0,
-    category: "Ácidos Inorgânicos Oxidantes/Manuseio Especial", // Desincrustante ácido
-    colorCode: "bg-blue-600",
-    image: "/placeholder-chemical-bottle.jpg",
-  },
-  {
-    id: "67",
-    code: "LIMPEZA-003",
-    name: "Bissulfito de Sódio",
-    price: 30.0,
-    category: "Químicos Gerais", // Agente redutor
-    colorCode: "bg-gray-200",
-    image: "/placeholder-raw-material.jpg",
-  },
-  // Borax (Borato de Sódio) (já existe)
-  // Formaldeído (já existe)
-  // Hidróxido de Potássio (já existe)
-  // Hidróxido de Sódio (já existe)
-  // Hipoclorito de Sódio (já existe)
-  // Metabissulfito de Sódio (já existe)
-  {
-    id: "68",
-    code: "LIMPEZA-004",
-    name: "Percarbonato de Sódio",
-    price: 38.0,
-    category: "Oxidantes", // Alvejante, agente de limpeza
-    colorCode: "bg-lime-500",
-    image: "/placeholder-raw-material.jpg",
-  },
-  // Peróxido de Hidrogênio (já existe)
-  {
-    id: "69",
-    code: "LIMPEZA-005",
-    name: "Silicato de Sódio Alcalino",
-    price: 45.0,
-    category: "Bases", // Anticorrosivo, detergente
-    colorCode: "bg-green-700",
-    image: "/placeholder-chemical-bottle.jpg",
-  },
-  {
-    id: "70",
-    code: "LIMPEZA-006",
-    name: "Sulfato de Alumínio Isento de Ferro",
-    price: 50.0,
-    category: "Químicos Gerais", // Tratamento de água
-    colorCode: "bg-gray-200",
-    image: "/placeholder-raw-material.jpg",
-  },
-  {
-    id: "71",
-    code: "LIMPEZA-007",
-    name: "Sulfato de Sódio",
-    price: 15.0,
-    category: "Químicos Gerais", // Carga em detergentes
-    colorCode: "bg-gray-200",
-    image: "/placeholder-raw-material.jpg",
-  },
-];
+  return (
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto flex flex-col md:flex-row">
+        {/* Lado Esquerdo: Visualização do Balde */}
+        <div className="w-full md:w-1/2 bg-gray-50 p-8 flex flex-col items-center justify-center border-b md:border-b-0 md:border-r border-gray-200">
+          <h3 className="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2">
+            <Palette className="w-5 h-5" /> Visualização do Produto
+          </h3>
 
-// Categorias atualizadas para corresponder à tabela e em português
+          <div className="relative group">
+            {/* SVG do Balde com cor dinâmica */}
+            <svg
+              width="240"
+              height="240"
+              viewBox="0 0 200 220"
+              className="drop-shadow-xl transition-transform duration-300 hover:scale-105"
+            >
+              <defs>
+                <linearGradient id="canMetal" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stopColor="#d1d5db" />
+                  <stop offset="20%" stopColor="#f3f4f6" />
+                  <stop offset="50%" stopColor="#ffffff" />
+                  <stop offset="80%" stopColor="#d1d5db" />
+                  <stop offset="100%" stopColor="#9ca3af" />
+                </linearGradient>
+              </defs>
+              <path
+                d="M 20 60 C 20 20, 180 20, 180 60"
+                fill="none"
+                stroke="#9ca3af"
+                strokeWidth="4"
+              />
+              <path
+                d="M 20 60 L 20 180 C 20 200, 180 200, 180 180 L 180 60 Z"
+                fill="url(#canMetal)"
+              />
+              <ellipse
+                cx="100"
+                cy="60"
+                rx="80"
+                ry="20"
+                fill="#e5e7eb"
+                stroke="#9ca3af"
+                strokeWidth="2"
+              />
+
+              {/* A TINTA QUE MUDA DE COR */}
+              <ellipse
+                cx="100"
+                cy="60"
+                rx="70"
+                ry="16"
+                fill={color}
+                className="transition-colors duration-300"
+              />
+
+              <path
+                d="M 21 90 C 21 90, 100 110, 179 90 L 179 150 C 179 150, 100 170, 21 150 Z"
+                fill="#117540"
+              />
+              <g transform="translate(45, 100)">
+                <Hexagon
+                  size={40}
+                  color="white"
+                  strokeWidth={2.5}
+                  className="ml-1"
+                />
+                <FlaskConical
+                  size={20}
+                  color="white"
+                  x={11}
+                  y={10}
+                  strokeWidth={2.5}
+                />
+                <text
+                  x="50"
+                  y="28"
+                  fontFamily="sans-serif"
+                  fontWeight="bold"
+                  fontSize="24"
+                  fill="white"
+                >
+                  Quimex
+                </text>
+              </g>
+              <circle cx="20" cy="65" r="3" fill="#6b7280" />
+              <circle cx="180" cy="65" r="3" fill="#6b7280" />
+            </svg>
+          </div>
+          <p className="mt-6 text-sm text-gray-500 text-center px-4">
+            A cor selecionada será preparada automaticamente pelo sistema
+            tintométrico Quimex.
+          </p>
+        </div>
+
+        {/* Lado Direito: Controles */}
+        <div className="w-full md:w-1/2 p-8 flex flex-col">
+          <div className="flex justify-between items-start mb-6">
+            <div>
+              <h2 className="text-2xl font-bold text-gray-900">
+                Configurar Cor
+              </h2>
+              <p className="text-sm text-gray-500">
+                Escolha a cor para o lote de tinta.
+              </p>
+            </div>
+            <button
+              onClick={onClose}
+              className="p-2 hover:bg-gray-100 rounded-full text-gray-500"
+            >
+              <X size={24} />
+            </button>
+          </div>
+
+          <div className="flex-1 space-y-6">
+            {/* Input Hex */}
+            <div className="flex gap-4 items-center p-4 bg-gray-50 rounded-lg border border-gray-200">
+              <input
+                type="color"
+                value={color}
+                onChange={handleHexChange}
+                className="w-12 h-12 rounded cursor-pointer border-0 p-0"
+              />
+              <div className="flex-1">
+                <label className="text-xs font-bold text-gray-500 uppercase">
+                  Código Hex
+                </label>
+                <input
+                  type="text"
+                  value={color.toUpperCase()}
+                  readOnly
+                  className="w-full bg-transparent font-mono text-lg text-gray-800 focus:outline-none"
+                />
+              </div>
+            </div>
+
+            {/* Sliders RGB */}
+            <div className="space-y-4">
+              {["r", "g", "b"].map((channel) => (
+                <div key={channel} className="space-y-1">
+                  <div className="flex justify-between text-xs font-semibold uppercase text-gray-500">
+                    <span>
+                      {channel === "r"
+                        ? "Vermelho"
+                        : channel === "g"
+                          ? "Verde"
+                          : "Azul"}
+                    </span>
+                    <span>{rgb[channel]}</span>
+                  </div>
+                  <input
+                    type="range"
+                    min="0"
+                    max="255"
+                    value={rgb[channel]}
+                    onChange={(e) => handleRgbChange(channel, e.target.value)}
+                    className={`w-full h-2 rounded-lg appearance-none cursor-pointer 
+                      ${
+                        channel === "r"
+                          ? "bg-red-100 accent-red-500"
+                          : channel === "g"
+                            ? "bg-green-100 accent-green-500"
+                            : "bg-blue-100 accent-blue-500"
+                      }`}
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="mt-8 pt-6 border-t border-gray-100">
+            <button
+              onClick={() => onConfirm(color)}
+              className="w-full bg-green-600 hover:bg-green-700 text-white py-4 rounded-xl font-bold text-lg shadow-lg shadow-green-600/20 transition-all flex items-center justify-center gap-2"
+            >
+              <Check size={24} />
+              Registrar Cor e Adicionar ao Carrinho
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// --- DADOS DOS PRODUTOS ---
+// const chemicalProducts = [
+//   // Novo Produto: Tinta Personalizável
+//   {
+//     id: "custom-paint-base", // ID base
+//     code: "QMX-TINTA",
+//     name: "Tinta Acrílica Premium (Personalizada)",
+//     price: 89.90,
+//     category: "Tintas",
+//     image: null, // Será gerado dinamicamente
+//     isCustom: true // Flag para ativar o modal
+//   },
+//   {
+//     id: "1",
+//     code: "QMX-001",
+//     name: "Ácido Sulfúrico 98%",
+//     price: 45.9,
+//     category: "Ácidos",
+//     image: "/sulfuric-acid-bottle.jpg",
+//   },
+//   {
+//     id: "2",
+//     code: "QMX-002",
+//     name: "Hidróxido de Sódio",
+//     price: 32.5,
+//     category: "Bases",
+//     image: "/sodium-hydroxide-bottle.jpg",
+//   },
+//   {
+//     id: "3",
+//     code: "QMX-003",
+//     name: "Álcool Etílico 99.5%",
+//     price: 28.9,
+//     category: "Solventes",
+//     image: "/ethanol-bottle.jpg",
+//   },
+//   {
+//     id: "4",
+//     code: "QMX-004",
+//     name: "Acetona PA",
+//     price: 35.0,
+//     category: "Solventes",
+//     image: "/acetone-bottle.jpg",
+//   },
+//   {
+//     id: "5",
+//     code: "QMX-005",
+//     name: "Cloreto de Sódio",
+//     price: 15.9,
+//     category: "Sais",
+//     image: "/sodium-chloride-bottle.jpg",
+//   },
+//   {
+//     id: "6",
+//     code: "QMX-006",
+//     name: "Peróxido de Hidrogênio",
+//     price: 22.5,
+//     category: "Oxidantes",
+//     image: "/hydrogen-peroxide-bottle.jpg",
+//   },
+//   {
+//     id: "7",
+//     code: "QMX-007",
+//     name: "Ácido Clorídrico 37%",
+//     price: 38.9,
+//     category: "Ácidos",
+//     image: "/hydrochloric-acid-bottle.jpg",
+//   },
+//   {
+//     id: "8",
+//     code: "QMX-008",
+//     name: "Carbonato de Cálcio",
+//     price: 18.5,
+//     category: "Sais",
+//     image: "/calcium-carbonate-bottle.jpg",
+//   },
+// ];
+
 const categories = [
   "Todos",
-  "Ácidos Inorgânicos",
-  "Ácidos Orgânicos",
+  "Tintas",
+  "Ácidos",
   "Bases",
-  "Ácidos Inorgânicos Oxidantes/Manuseio Especial",
+  "Solventes",
+  "Sais",
   "Oxidantes",
-  "Tóxicos",
-  "Inflamáveis",
-  "Químicos Gerais",
 ];
 
-// ================================
-// Componente Principal
-// ================================
+// --- COMPONENTE PRINCIPAL (PDV) ---
 export default function QuimexPOS() {
+  const { user, isLoading } = useAuth();
+  const router = useRouter();
+  useEffect(() => {
+    if (!isLoading && !user) {
+      router.push("/login");
+    }
+  }, [user, isLoading, router]);
   const [cart, setCart] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("Todos");
   const [showPayment, setShowPayment] = useState(false);
-  const [valorInicial, setValorInicial] = useState(0);
+  const [chemicalProducts, setChemicalProducts] = useState([]);
 
-  // Ao abrir o sistema, define o valor inicial do caixa se ainda não existir
   useEffect(() => {
-    const hoje = new Date().toISOString().split("T")[0];
-    const dataCaixa = localStorage.getItem("caixaData");
-    const valorSalvo = localStorage.getItem("caixaAbertura");
-
-    if (dataCaixa === hoje && valorSalvo) {
-      setValorInicial(parseFloat(valorSalvo));
-    } else {
-      // Redireciona para a página de abertura de caixa se não houver valor para hoje
-      window.location.href = "/";
+    if (user) {
+      fetch("http://localhost:8080/produtos", {
+        credentials: "include",
+      })
+        .then((res) => {
+          return res.json();
+        })
+        .then((data) => {
+          const customItem = {
+            id: "custom-paint-base",
+            sku: "QMX-TINTA",
+            nome: "Tinta Acrílica Premium (Personalizada)",
+            preco: 89.9,
+            classificacao: "Tintas",
+            imagem: null,
+            isCustom: true,
+          };
+          const items = data.produtos.filter(
+            (item) => item.filial == user.Loja_vinculada
+          );
+          setChemicalProducts([customItem, ...(items || [])]);
+        });
     }
-  }, []);
+  }, [user]);
 
-  const filteredProducts = chemicalProducts.filter((product) => {
-    const matchesSearch =
-      product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      product.code.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory =
-      selectedCategory === "Todos" || product.category === selectedCategory;
-    return matchesSearch && matchesCategory;
-  });
+  // Estados para o Misturador
+  const [showMixer, setShowMixer] = useState(false);
+  const [tempProduct, setTempProduct] = useState(null); // Produto sendo customizado
 
-  const addToCart = (product) => {
+  const filteredProducts = chemicalProducts
+    ? chemicalProducts.filter((product) => {
+        const matchesSearch =
+          product.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          product.sku.toLowerCase().includes(searchTerm.toLowerCase());
+        const matchesCategory =
+          selectedCategory === "Todos" || product.category === selectedCategory;
+        return matchesSearch && matchesCategory;
+      })
+    : null;
+
+  const initiateAddToCart = (product) => {
+    if (product.isCustom) {
+      setTempProduct(product);
+      setShowMixer(true);
+    } else {
+      addToCartDirectly(product);
+    }
+  };
+
+  const handleConfirmColor = (selectedColor) => {
+    if (tempProduct) {
+      // Cria um ID único baseado na cor para diferenciar no carrinho
+      // Ex: Tintas vermelhas separadas de tintas azuis
+      const customProduct = {
+        ...tempProduct,
+        id: `${tempProduct.id}-${selectedColor}`,
+        name: `${tempProduct.name} - ${selectedColor.toUpperCase()}`,
+        selectedColor: selectedColor, // Propriedade especial para renderizar no carrinho
+      };
+      addToCartDirectly(customProduct);
+      setShowMixer(false);
+      setTempProduct(null);
+    }
+  };
+
+  const addToCartDirectly = (product) => {
     setCart((prev) => {
       const existing = prev.find((item) => item.id === product.id);
       if (existing) {
@@ -760,473 +437,419 @@ export default function QuimexPOS() {
     );
   };
 
-  const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const total = cart.reduce((sum, item) => sum + item.preco * item.quantity, 0);
 
-  const handlePayment = (method) => {
-    const novaVenda = {
-      id: Date.now(),
-      dataHora: new Date().toLocaleString(),
-      itens: cart,
-      total,
-      metodo: method,
-      vendedor: "Hemerson", // Adiciona o nome do vendedor
-    };
+  const handlePayment = async (method) => {
+    // const turnoId = sessionStorage.getItem("turnoId");
+    // const operador = localStorage.getItem("usuarioLogado");
 
-    // Salvar venda no histórico diário
-    const vendas = JSON.parse(localStorage.getItem("vendas") || "[]");
-    vendas.push(novaVenda);
-    localStorage.setItem("vendas", JSON.stringify(vendas));
+    cart.forEach((produto) => {
+      fetch("http://localhost:8080/produtos", {
+        credentials: "include",
+      })
+        .then((res) => {
+          return res.json();
+        })
+        .then((data) => {
+          const customItem = {
+            id: "custom-paint-base",
+            sku: "QMX-TINTA",
+            nome: "Tinta Acrílica Premium (Personalizada)",
+            preco: 89.9,
+            classificacao: "Tintas",
+            imagem: null,
+            isCustom: true,
+          };
+          const items = data.produtos.filter(
+            (item) => item.filial == user.Loja_vinculada
+          );
+          return [customItem, ...(items || [])];
+        })
+        .then((produtos) => {
+          const index = produtos.findIndex((item) => item.id === produto.id);
+          produto.quantidade = produtos[index].quantidade - produto.quantity;
+          const menos = produto.quantity;
+          fetch(`http://localhost:8080/produtos/${produto.id}`, {
+            credentials: "include",
+            headers: {
+              "content-type": "application/json",
+            },
+            method: "put",
+            body: JSON.stringify(produto),
+          }).then(() => {
+            setChemicalProducts((prevList) =>
+              prevList.map((item) =>
+                item.id === produto.id
+                  ? { ...item, quantidade: item.quantidade - menos }
+                  : item
+              )
+            );
+          });
+        });
 
-    // Gerar comprovante
-    gerarComprovanteCliente(novaVenda);
+      fetch(`http://localhost:8080/transferencias`, {
+        credentials: "include",
+        headers: {
+          "content-type": "application/json",
+        },
+        method: "post",
+        body: JSON.stringify({
+          loja: user.Loja_vinculada,
+          produto: produto.id,
+          quantidade_produto: produto.quantity,
+          preco: produto.preco,
+          troco: 0,
+        }),
+      });
+    });
 
-    alert(`Pagamento de R$ ${total.toFixed(2)} realizado via ${method}`);
+    alert(`Venda registrada com sucesso! Pagamento via ${method}.`);
     setCart([]);
     setShowPayment(false);
   };
 
-  const gerarComprovanteCliente = (venda) => {
-    const conteudoItens = venda.itens.map(
-      (i) =>
-        `Produto: ${i.name}\n` +
-        `Quantidade: ${i.quantity}x\n` +
-        `Preço Unitário: R$ ${i.price.toFixed(2)}\n` +
-        `Preço Total do Produto: R$ ${(i.price * i.quantity).toFixed(2)}\n`
-    ).join("-----------------------------\n");
-
-    const conteudo = `
-      *** COMPROVANTE DE VENDA ***
-      LOCAL DA FILIAL - SP
-      CNPJ: 72.395.047/1152-63
-      IE: 654.998.172
-      Data: ${venda.dataHora}
-      Forma de Pagamento: ${venda.metodo}
-      Vendedor: ${venda.vendedor}
-      -----------------------------
-      ${conteudoItens}
-      -----------------------------
-      TOTAL DA COMPRA: R$ ${venda.total.toFixed(2)}
-      Obrigado pela preferência!
-    `;
-
-    const novaJanela = window.open("", "_blank");
-    novaJanela.document.write(`<pre>${conteudo}</pre>`);
-    novaJanela.print();
-  };
-
-  // Modal para fechar caixa
-  const [showCloseModal, setShowCloseModal] = useState(false);
-
-  // Abrir modal
-  const handleOpenCloseModal = () => {
-    setShowCloseModal(true);
-  };
-
-  // Fechar modal
-  const handleCloseModal = () => {
-    setShowCloseModal(false);
-  };
-
-  // Função para baixar comprovante fiscal
-  const handleDownloadFiscal = () => {
-    const comprovante = {
-      data: new Date().toLocaleString(),
-      valorInicial,
-      totalVendido: cart.reduce((acc, item) => acc + item.price * item.quantity, 0),
-      itens: cart.map((i) => ({
-        produto: i.name,
-        quantidade: i.quantity,
-        valorUnitario: i.price,
-        totalItem: i.price * i.quantity
-      }))
-    };
-
-    const blob = new Blob([JSON.stringify(comprovante, null, 2)], {
-      type: "application/json",
-    });
-
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "comprovante-fiscal.json";
-    a.click();
-    URL.revokeObjectURL(url);
-  };
-
-  // Confirmar fechamento de caixa
-  const handleCloseCashRegister = () => {
-    // Limpa carrinho
-    setCart([]);
-
-    // Resetar valores
-    localStorage.setItem("caixaAbertura", "0");
-    localStorage.setItem("caixaData", "");
-    alert("Caixa fechado com sucesso!");
-
-    setShowCloseModal(false);
-  };
-
-
-  // Desconectar usuário
-  const handleLogout = () => {
-    const dataCaixa = localStorage.getItem("caixaData");
-    const valorSalvo = localStorage.getItem("caixaAbertura");
-    const usuarioSalvo = localStorage.getItem("usuarioLogado");
-
-    // Resetar
-    localStorage.setItem("usuarioLogado", "");
-    localStorage.setItem("caixaAbertura", "0");
-    localStorage.setItem("caixaData", "");
-
-    window.location.href = "/";
-  };
-
-
-
-  const gerarFechamentoCaixa = () => {
-    const hoje = new Date().toISOString().split("T")[0];
-    const vendas = JSON.parse(localStorage.getItem("vendas") || "[]")
-      .filter((v) => v.dataHora.startsWith(new Date(hoje).toLocaleDateString())); // Filtra vendas do dia atual
-
-    const totalDia = vendas.reduce((acc, v) => acc + v.total, 0);
-    const conteudoVendas = vendas.map(
-      (v) =>
-        `  - Venda ID: ${v.id}\n` +
-        `    Data/Hora: ${v.dataHora}\n` +
-        `    Método de Pagamento: ${v.metodo}\n` +
-        `    Itens:\n` +
-        `${v.itens.map(item => `      - ${item.name} (${item.quantity}x) R$ ${item.price.toFixed(2)} = R$ ${(item.price * item.quantity).toFixed(2)}`).join('\n')}\n` +
-        `    Total da Venda: R$ ${v.total.toFixed(2)}\n`
-    ).join("-----------------------------\n");
-
-    const conteudo = `
-      *** FECHAMENTO DO CAIXA ***
-      Data: ${new Date().toLocaleDateString()}
-      Vendedor: Hemerson
-      -----------------------------
-      Valor Inicial do Caixa: R$ ${valorInicial.toFixed(2)}
-      -----------------------------
-      Detalhes das Vendas do Dia (${vendas.length} vendas):
-      -----------------------------
-      ${conteudoVendas || 'Nenhuma venda realizada hoje.'}
-      -----------------------------
-      TOTAL ARRECADADO EM VENDAS: R$ ${totalDia.toFixed(2)}
-      -----------------------------
-      SALDO FINAL DO CAIXA (Inicial + Vendas): R$ ${(valorInicial + totalDia).toFixed(2)}
-      -----------------------------
-      Quimex
-    `;
-
-    const novaJanela = window.open("", "_blank");
-    novaJanela.document.write(`<pre>${conteudo}</pre>`);
-    novaJanela.print();
-  };
-
-
-
   return (
-    <div className="flex h-screen bg-background">
+    <div className="flex h-screen bg-gray-50 text-slate-900 font-sans">
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Header */}
-        <header className="border-b border-border bg-primary px-6 py-4">
+        <header className="border-b border-gray-200 bg-white px-6 py-4 shadow-sm">
           <div className="flex items-center justify-between mb-4">
-            <div>
-              <h1 className="text-3xl font-bold text-primary-foreground">QUIMEX</h1>
-              <p className="text-sm text-primary-foreground">
-                Sistema de Caixa - Produtos Químicos
-              </p>
+            <div className="flex items-center gap-3">
+              <div className="bg-green-700 p-2 rounded-lg">
+                <Hexagon className="text-white h-6 w-6" />
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold text-slate-800 tracking-tight">
+                  QUIMEX <span className="text-green-600">POS</span>
+                </h1>
+                <p className="text-xs text-slate-500 font-medium">
+                  Sistema de Controle Químico
+                </p>
+              </div>
             </div>
-            <div className="text-right">
-              <p className="text-xs text-primary-foreground">Operador</p>
-              <p className="text-sm font-medium text-primary-foreground">Hemerson</p>
-              <p className="text-xs text-primary-foreground mt-1">Valor inicial: <span className="font-semibold">R$ {valorInicial.toFixed(2)}</span></p>
-
-            </div>
-            <button
-              onClick={() => gerarFechamentoCaixa()}
-              className="ml-4 px-3 py-2 bg-green-700 text-white rounded-md hover:bg-green-800 transition"
-            >
-              Fechar Caixa
-            </button>
-            {/* <div className="flex gap-4 justify-end mb-4">
-              <button
-                onClick={handleOpenCloseModal}
-                className="px-4 py-2 bg-red-600 text-white rounded-lg shadow"
-              >
-                Fechar Caixa
-              </button>
-              {showCloseModal && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                  <div className="bg-white rounded-xl p-6 w-[90%] max-w-md shadow-lg">
-                    <h2 className="text-xl font-semibold mb-4">
-                      Tem certeza que deseja fechar o caixa?
-                    </h2>
-
-                    <div className="flex flex-col gap-3">
-
-                      <button
-                        onClick={handleCloseCashRegister}
-                        className="w-full py-2 bg-red-600 text-white rounded-lg"
-                      >
-                        Sim, fechar caixa
-                      </button>
-
-                      <button
-                        onClick={handleDownloadFiscal}
-                        className="w-full py-2 bg-blue-600 text-white rounded-lg"
-                      >
-                        Baixar comprovante fiscal (todas as compras)
-                      </button>
-
-                      <button
-                        onClick={handleCloseModal}
-                        className="w-full py-2 bg-gray-300 text-black rounded-lg"
-                      >
-                        Cancelar
-                      </button>
-
-                    </div>
-                  </div>
+            <div className="flex items-center gap-4">
+              <div className="text-right hidden md:block">
+                <p className="text-xs text-slate-400 font-semibold uppercase">
+                  Operador
+                </p>
+                <div className="flex items-center gap-2">
+                  <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse"></div>
+                  <p className="text-sm font-bold text-slate-700">
+                    {typeof window !== "undefined" ? (
+                      user ? (
+                        <>{user.usuario}</>
+                      ) : null
+                    ) : (
+                      "Usuario"
+                    )}
+                  </p>
                 </div>
-              )} */}
-
-              {/* <button
-                onClick={handleLogout}
-                className="px-4 py-2 bg-gray-700 text-white rounded-lg shadow"
-              >
-                Desconectar
-              </button> */}
-            {/* </div> */}
-
-
+              </div>
+            </div>
           </div>
 
           <div className="flex gap-3">
             <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
               <input
                 type="text"
-                placeholder="Buscar por nome ou código do produto..."
+                placeholder="Buscar produto (Nome, Código ou SKU)..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 bg-background border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
+                className="w-full pl-10 pr-4 py-3 bg-gray-100 border-transparent rounded-lg focus:bg-white focus:border-green-500 focus:ring-2 focus:ring-green-500/20 transition-all outline-none text-sm"
               />
             </div>
           </div>
         </header>
 
         {/* Filtro */}
-        <div className="px-6 py-3 border-b border-border bg-card/50">
-          <div className="flex items-center gap-2">
-            <Filter className="h-4 w-4 text-muted-foreground" />
-            <span className="text-sm font-medium text-foreground mr-2">
-              Filtrar:
-            </span>
-
-            <div className="flex gap-2 flex-wrap">
-              {categories.map((category) => {
-                // Define cor conforme categoria
-                const colorMap = {
-                  "Ácidos Inorgânicos": "bg-orange-600",
-                  "Ácidos Orgânicos": "bg-yellow-500",
-                  Bases: "bg-green-700",
-                  "Ácidos Inorgânicos Oxidantes/Manuseio Especial": "bg-blue-600",
-                  Oxidantes: "bg-lime-500",
-                  Tóxicos: "bg-purple-600",
-                  Inflamáveis: "bg-red-600",
-                  "Químicos Gerais": "bg-gray-200",
-                  Todos: "bg-secondary",
-                };
-
-                const color = colorMap[category] || "bg-opink-300";
-                const isSelected = selectedCategory === category;
-
-                return (
-                  <button
-                    key={category}
-                    onClick={() => setSelectedCategory(category)}
-                    className={`flex items-center gap-2 px-4 py-1.5 rounded-md text-sm font-medium transition-all border
-              ${isSelected
-                        ? "border-primary bg-muted-foreground/20 text-pink"
-                        : "border-border bg-background text-background-foreground hover:bg-background/80"
-                      }`}
-                  >
-                    <span className={`w-3.5 h-3.5 rounded-full ${color} border border-border`}></span>
-                    {category}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-
-
-        {/* Produtos */}
-        <div className="flex-1 overflow-auto p-6">
-          <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {filteredProducts.map((product) => (
+        <div className="px-6 py-3 border-b border-gray-200 bg-white">
+          <div className="flex items-center gap-3 overflow-x-auto pb-2 scrollbar-hide">
+            <Filter className="h-4 w-4 text-gray-400 flex-shrink-0" />
+            {categories.map((category) => (
               <button
-                key={product.id}
-                onClick={() => addToCart(product)}
-                className="bg-card border border-border rounded-md overflow-hidden hover:border-primary hover:shadow-lg transition-all text-left"
+                key={category}
+                onClick={() => setSelectedCategory(category)}
+                className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all whitespace-nowrap ${
+                  selectedCategory === category
+                    ? "bg-slate-800 text-white shadow-md"
+                    : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                }`}
               >
-                {/* Faixa de cor da categoria */}
-                <div
-                  className={`${product.colorCode} h-2 w-full rounded-t-md`}
-                  style={{ marginTop: "0px", borderTopLeftRadius: "0.5rem", borderTopRightRadius: "0.5rem" }}
-                ></div>
-
-
-                <div className="p-4 space-y-1">
-                  <p className="text-xs text-muted-foreground font-mono">
-                    {product.code}
-                  </p>
-                  <h3 className="font-semibold text-sm text-foreground leading-tight">
-                    {product.name}
-                  </h3>
-                  <p className="text-xs text-muted-foreground">
-                    {product.category}
-                  </p>
-                  <p className="text-lg font-bold text-primary">
-                    R$ {product.price.toFixed(2)}
-                  </p>
-                </div>
+                {category}
               </button>
             ))}
           </div>
         </div>
-      </div>
 
-      {/* Carrinho */}
-      <div className="w-[450px] border-l border-border bg-card flex flex-col">
-        <div className="flex-1 overflow-auto p-4">
-          <h2 className="text-lg font-bold text-foreground mb-4">
-            Carrinho de Compras
-          </h2>
+        {/* Grade de Produtos */}
+        <div className="flex-1 overflow-auto p-6 bg-gray-50">
+          <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            {filteredProducts
+              ? filteredProducts.map((product) => (
+                  <button
+                    key={product.id}
+                    onClick={() => initiateAddToCart(product)}
+                    className="group bg-white border border-gray-200 rounded-xl p-4 hover:border-green-500 hover:shadow-lg hover:shadow-green-500/10 transition-all text-left relative overflow-hidden flex flex-col h-full"
+                  >
+                    {/* Badge para produto customizável */}
+                    {product.isCustom && (
+                      <div className="absolute top-0 right-0 bg-green-600 text-white text-[10px] font-bold px-2 py-1 rounded-bl-lg z-10">
+                        PERSONALIZAR
+                      </div>
+                    )}
 
-          {cart.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-64 text-muted-foreground">
-              <p className="text-sm">Nenhum item no carrinho</p>
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {cart.map((item) => (
-                <div
-                  key={item.id}
-                  className="bg-background border border-border rounded-lg p-3"
-                >
-                  <div className="flex gap-3">
-                    <img
-                      src={item.image || "/placeholder.svg"}
-                      alt={item.name}
-                      className="w-16 h-16 object-contain rounded"
-                    />
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xs text-muted-foreground font-mono">
-                        {item.code}
+                    <div className="w-full h-32 mb-4 rounded-lg bg-gray-50 flex items-center justify-center relative">
+                      {product.isCustom ? (
+                        // Ícone especial para o produto de tinta
+                        <Palette className="h-12 w-12 text-green-600 opacity-80 group-hover:scale-110 transition-transform" />
+                      ) : // Placeholder para produtos normais
+                      product.imagem ? (
+                        <img
+                          src={`http://localhost:8080${product.imagem}`}
+                          alt={product.nome}
+                          className="h-full object-contain"
+                        />
+                      ) : (
+                        <FlaskConical className="h-10 w-10 text-gray-300" />
+                      )}
+                    </div>
+
+                    <div className="flex-1 flex flex-col">
+                      <p className="text-[10px] text-gray-400 font-mono mb-1">
+                        {product.sku}
                       </p>
-                      <h3 className="font-semibold text-sm text-foreground leading-tight">
-                        {item.name}
+                      <h3 className="font-semibold text-sm text-gray-800 leading-tight mb-1 line-clamp-2">
+                        {product.nome}
                       </h3>
-                      <div className="flex items-center justify-between mt-2">
-                        <div className="flex items-center gap-2">
-                          <button
-                            onClick={() => updateQuantity(item.id, -1)}
-                            disabled={item.quantity <= 1}
-                            className="h-7 w-7 flex items-center justify-center rounded-md bg-secondary hover:bg-secondary/80 disabled:opacity-50 transition-colors"
-                          >
-                            <Minus className="h-4 w-4" />
-                          </button>
-                          <span className="font-bold text-sm text-foreground min-w-[3ch] text-center">
-                            {item.quantity}x
-                          </span>
-                          <button
-                            onClick={() => updateQuantity(item.id, 1)}
-                            className="h-7 w-7 flex items-center justify-center rounded-md bg-secondary hover:bg-secondary/80 transition-colors"
-                          >
-                            <Plus className="h-4 w-4" />
-                          </button>
-                        </div>
-                        <p className="text-sm font-bold text-primary">
-                          R$ {(item.price * item.quantity).toFixed(2)}
+                      <div className="mt-auto flex items-end justify-between pt-2">
+                        <p className="text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded">
+                          {product.classificacao}
+                        </p>
+                        <p className="text-lg font-bold text-slate-800">
+                          R$ {product.preco.toFixed(2)}
                         </p>
                       </div>
                     </div>
-                    <button
-                      onClick={() => removeFromCart(item.id)}
-                      className="h-8 w-8 flex items-center justify-center rounded-md bg-destructive/10 text-destructive hover:bg-destructive hover:text-destructive-foreground transition-colors"
-                    >
-                      <X className="h-4 w-4" />
-                    </button>
-                  </div>
-                </div>
-              ))}
+                  </button>
+                ))
+              : null}
+          </div>
+        </div>
+      </div>
+
+      {/* Carrinho Lateral */}
+      <div className="w-[400px] border-l border-gray-200 bg-white flex flex-col shadow-xl z-20">
+        <div className="p-5 border-b border-gray-100 bg-gray-50/50">
+          <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2">
+            <div className="bg-slate-800 text-white p-1 rounded">
+              <CreditCard size={16} />
             </div>
+            Carrinho Atual
+          </h2>
+        </div>
+
+        <div className="flex-1 overflow-auto p-4 space-y-3">
+          {cart.length === 0 ? (
+            <div className="flex flex-col items-center justify-center h-full text-gray-400 gap-4 opacity-60">
+              <div className="bg-gray-100 p-6 rounded-full">
+                <Search size={40} />
+              </div>
+              <p className="text-sm font-medium">
+                Caixa livre. Aguardando produtos.
+              </p>
+            </div>
+          ) : (
+            cart.map((item) => (
+              <div
+                key={item.id}
+                className="bg-white border border-gray-100 rounded-xl p-3 shadow-sm hover:shadow-md transition-shadow group relative"
+              >
+                <div className="flex gap-3">
+                  {/* Renderização da Imagem no Carrinho */}
+                  <div className="w-16 h-16 rounded-lg bg-gray-50 border border-gray-100 flex items-center justify-center flex-shrink-0 overflow-hidden">
+                    {item.selectedColor ? (
+                      // Se for tinta personalizada, mostra a cor
+                      <div className="w-full h-full relative group-hover:scale-110 transition-transform">
+                        <div
+                          className="absolute inset-0"
+                          style={{ backgroundColor: item.selectedColor }}
+                        ></div>
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <span className="text-[10px] text-white/90 font-mono bg-black/20 px-1 rounded backdrop-blur-sm">
+                            {item.selectedColor}
+                          </span>
+                        </div>
+                      </div>
+                    ) : (
+                      <img
+                        src={`http://localhost:8080${item.imagem}`}
+                        alt={item.nome}
+                        className="h-full object-contain"
+                      />
+                    )}
+                  </div>
+
+                  <div className="flex-1 min-w-0 flex flex-col justify-between py-0.5">
+                    <div>
+                      <h3
+                        className="font-semibold text-sm text-slate-800 leading-tight truncate"
+                        title={item.nome}
+                      >
+                        {item.nome}
+                      </h3>
+                      <p className="text-[10px] text-gray-400 font-mono mt-0.5">
+                        {item.sku}
+                      </p>
+                    </div>
+
+                    <div className="flex items-center justify-between mt-2">
+                      <div className="flex items-center gap-2 bg-gray-100 rounded-lg p-0.5">
+                        <button
+                          onClick={() => updateQuantity(item.id, -1)}
+                          disabled={item.quantity <= 1}
+                          className="h-6 w-6 flex items-center justify-center rounded-md bg-white text-gray-600 shadow-sm hover:text-red-500 disabled:opacity-50 disabled:hover:text-gray-600 transition-colors"
+                        >
+                          <Minus size={12} />
+                        </button>
+                        <span className="font-bold text-xs text-slate-700 min-w-[20px] text-center">
+                          {item.quantity}
+                        </span>
+                        <button
+                          onClick={() => updateQuantity(item.id, 1)}
+                          className="h-6 w-6 flex items-center justify-center rounded-md bg-white text-gray-600 shadow-sm hover:text-green-600 transition-colors"
+                        >
+                          <Plus size={12} />
+                        </button>
+                      </div>
+                      <p className="text-sm font-bold text-slate-800">
+                        R$ {(item.preco * item.quantity).toFixed(2)}
+                      </p>
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={() => removeFromCart(item.id)}
+                    className="absolute -top-2 -right-2 h-6 w-6 bg-red-100 text-red-600 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-500 hover:text-white"
+                  >
+                    <X size={12} />
+                  </button>
+                </div>
+              </div>
+            ))
           )}
         </div>
 
-        {/* Total e Pagamento */}
-        <div className="border-t border-border p-4 bg-muted/30">
-          <div className="flex justify-between items-center mb-4">
-            <span className="text-lg font-semibold text-foreground">Total:</span>
-            <span className="text-2xl font-bold text-primary">
-              R$ {total.toFixed(2)}
-            </span>
+        {/* Footer do Carrinho */}
+        <div className="border-t border-gray-200 p-5 bg-white space-y-4">
+          <div className="space-y-2">
+            <div className="flex justify-between items-center text-sm text-gray-500">
+              <span>
+                Subtotal ({cart.reduce((acc, i) => acc + i.quantity, 0)} itens)
+              </span>
+              <span>R$ {total.toFixed(2)}</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-xl font-bold text-slate-800">
+                Total Final
+              </span>
+              <span className="text-2xl font-bold text-green-700">
+                R$ {total.toFixed(2)}
+              </span>
+            </div>
           </div>
 
           <button
             onClick={() => setShowPayment(true)}
             disabled={cart.length === 0}
-            className="w-full bg-primary text-primary-foreground py-4 rounded-lg font-semibold text-lg hover:bg-primary/90 transition-colors disabled:opacity-50"
+            className="w-full bg-slate-900 text-white py-4 rounded-xl font-bold text-lg hover:bg-slate-800 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-slate-900/20 flex items-center justify-center gap-2"
           >
-            Finalizar Venda
+            <span>Finalizar Venda</span>
+            <CreditCard size={20} className="opacity-80" />
           </button>
         </div>
       </div>
 
+      {/* --- MODAIS --- */}
+
+      {/* Modal de Misturador de Tinta */}
+      {showMixer && (
+        <PaintMixerModal
+          onClose={() => {
+            setShowMixer(false);
+            setTempProduct(null);
+          }}
+          onConfirm={handleConfirmColor}
+        />
+      )}
+
       {/* Modal de Pagamento */}
       {showPayment && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-card border border-border rounded-lg p-6 w-[500px] max-w-[90vw]">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-bold text-foreground">
-                Forma de Pagamento
-              </h2>
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
+            <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+              <h2 className="text-xl font-bold text-gray-800">Pagamento</h2>
               <button
                 onClick={() => setShowPayment(false)}
-                className="h-8 w-8 flex items-center justify-center rounded-md hover:bg-muted transition-colors"
+                className="h-8 w-8 flex items-center justify-center rounded-full bg-white text-gray-500 hover:bg-red-50 hover:text-red-500 transition-colors shadow-sm"
               >
-                <X className="h-5 w-5" />
+                <X size={18} />
               </button>
             </div>
 
-            <div className="mb-6 p-4 bg-muted rounded-lg">
-              <p className="text-sm text-muted-foreground mb-1">
-                Total a pagar:
+            <div className="p-8 flex flex-col items-center">
+              <p className="text-sm text-gray-500 mb-1 font-medium uppercase tracking-wide">
+                Valor a Receber
               </p>
-              <p className="text-3xl font-bold text-primary">
+              <p className="text-5xl font-bold text-slate-800 mb-8">
                 R$ {total.toFixed(2)}
               </p>
+
+              <div className="grid grid-cols-2 gap-4 w-full">
+                {[
+                  {
+                    id: "Débito",
+                    icon: CreditCard,
+                    color: "text-blue-600",
+                    bg: "bg-blue-50 hover:bg-blue-100 hover:border-blue-200",
+                  },
+                  {
+                    id: "Crédito",
+                    icon: CreditCard,
+                    color: "text-purple-600",
+                    bg: "bg-purple-50 hover:bg-purple-100 hover:border-purple-200",
+                  },
+                  {
+                    id: "Dinheiro",
+                    icon: Banknote,
+                    color: "text-green-600",
+                    bg: "bg-green-50 hover:bg-green-100 hover:border-green-200",
+                  },
+                  {
+                    id: "PIX",
+                    icon: Smartphone,
+                    color: "text-teal-600",
+                    bg: "bg-teal-50 hover:bg-teal-100 hover:border-teal-200",
+                  },
+                ].map((method) => (
+                  <button
+                    key={method.id}
+                    onClick={() => handlePayment(method.id)}
+                    className={`flex flex-col items-center gap-3 p-4 rounded-xl border border-transparent transition-all duration-200 ${method.bg}`}
+                  >
+                    <method.icon className={`h-8 w-8 ${method.color}`} />
+                    <span className="font-semibold text-gray-700 text-sm">
+                      {method.id}
+                    </span>
+                  </button>
+                ))}
+              </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
-              {[
-                { name: "Débito", icon: <CreditCard /> },
-                { name: "Crédito", icon: <CreditCard /> },
-                { name: "Dinheiro", icon: <Banknote /> },
-                { name: "PIX", icon: <Smartphone /> },
-              ].map((method) => (
-                <button
-                  key={method.name}
-                  onClick={() => handlePayment(method.name)}
-                  className="flex flex-col items-center gap-3 p-6 bg-background border-2 border-border rounded-lg hover:border-primary hover:bg-primary/5 transition-all"
-                >
-                  <div className="h-10 w-10 text-primary">{method.icon}</div>
-                  <span className="font-semibold text-foreground">
-                    {method.name}
-                  </span>
-                </button>
-              ))}
+            <div className="bg-gray-50 p-4 text-center border-t border-gray-100">
+              <p className="text-xs text-gray-400">
+                Transação segura e criptografada
+              </p>
             </div>
           </div>
         </div>

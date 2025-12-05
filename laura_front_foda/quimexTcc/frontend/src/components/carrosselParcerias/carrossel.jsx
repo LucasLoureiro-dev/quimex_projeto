@@ -71,11 +71,6 @@ export default function EmblaCarousel() {
         <CarouselPrevious />
         <CarouselNext />
       </Carousel>
-      <div className="flex flex-col items-center">
-        <Button>
-        <Link href="/parcerias">Seja Nosso Parceiro</Link>
-      </Button>
-      </div>
     </div>
   );
 }

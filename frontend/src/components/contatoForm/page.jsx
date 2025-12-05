@@ -56,7 +56,7 @@ export default function ContatoForm(){
             </div>
             <div>
               <h4 className="text-primary font-bold">Telefone:</h4>
-            <p>+1 2345-5643</p>
+            <p>11 2345-5643</p>
             </div>           
             <small>Disponível para contato de <span className="font-bold text-secondary"> Segunda a Sexta, 9h - 17h (BRT)</span></small>
         </div> 

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
 import { mockUsers, mockLojas } from "@/lib/mock-data"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -34,7 +34,7 @@ import { ControlePaginacao } from "@/components/paginacao/controlePaginacao";
 import { CardFuncionarios } from "@/components/cards/CardFuncionarios";
 
 export default function FuncionariosPage() {
-  const [funcionarios, setFuncionarios] = useState(mockUsers)
+  const [funcionarios, setFuncionarios] = useState([])
   const [searchTerm, setSearchTerm] = useState("")
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [editingFuncionario, setEditingFuncionario] = useState(null)
@@ -58,16 +58,42 @@ export default function FuncionariosPage() {
     valor: "1,234",
     icon: UserRoundPlus,
   },
-  {
-    titulo: "Desligamentos",
-    valor: "1,234",
-    icon: UserRoundMinus,
-  },
-  {
-    titulo: "Taxa de retenção",
-    valor: "1,234",
-    icon: ChartLine,
-  }]
+  ]
+
+  const buscaUsuarioLogado = async () => {
+    const busca_usuario_logado = await fetch("http://localhost:8080/dashboard",
+      {
+        credentials: "include"
+      }
+    )
+    const res = await busca_usuario_logado.json();
+    const usuarioBuscado = res
+    return usuarioBuscado;
+  }
+
+  const buscaFuncionarios = async () => {
+    const busca_funcionarios = await fetch("http://localhost:8080/usuarios",
+      {
+        credentials: "include"
+      }
+    )
+    const res = await busca_funcionarios.json();
+    const funcionariosBuscados = res
+    return funcionariosBuscados;
+  }
+
+  const filtraFuncionarios = async () => {
+    const funcionarios = await buscaFuncionarios()
+    const usuario_logado = await buscaUsuarioLogado()
+
+    const filtraFuncionarios = funcionarios.filter(f => f.loja_vinculada === usuario_logado.Loja_vinculada)
+    console.log(filtraFuncionarios)
+    setFuncionarios(filtraFuncionarios)
+  }
+
+  useEffect(() => {
+    filtraFuncionarios()
+  }, [])
 
 
   const handleEditFuncionario = (funcionario) => {
@@ -255,18 +281,18 @@ export default function FuncionariosPage() {
 
               <div>
                 <div className="space-y-2">
-                <Label htmlFor="role">Cargo</Label>
-                <Select value={formData.role} onValueChange={(value) => setFormData({ ...formData, role: value })}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="admin_matriz">Administrador Matriz</SelectItem>
-                    <SelectItem value="gerente_filial">Gerente de Filial</SelectItem>
-                    <SelectItem value="vendedor">Vendedor</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+                  <Label htmlFor="role">Cargo</Label>
+                  <Select value={formData.role} onValueChange={(value) => setFormData({ ...formData, role: value })}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="admin_matriz">Administrador Matriz</SelectItem>
+                      <SelectItem value="gerente_filial">Gerente de Filial</SelectItem>
+                      <SelectItem value="vendedor">Vendedor</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
                 <div className="space-y-2">
                   <Label htmlFor="loja">Loja</Label>
                   <Select
@@ -286,7 +312,7 @@ export default function FuncionariosPage() {
                   </Select>
                 </div>
               </div>
-              
+
             </div>
             <div className="flex justify-end gap-3">
               <Button variant="outline" onClick={() => handleCloseDialog(false)}>
@@ -298,25 +324,25 @@ export default function FuncionariosPage() {
         </Dialog>
       </div>
 
-    
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          {infoFuncionarios.map((info, index) => {
-            const Icon = info.icon;
-            return (
-              <div
-                key={index}
-                className="rounded-xl p-6 border bg-card border-border shadow-sm hover:shadow-md transition"
-              >
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-sm font-medium text-muted-foreground">{info.titulo}</h3>
-                  <Icon className="w-5 h-5 text-foreground/60" />
-                </div>
-                <div className="text-3xl font-bold mb-1">{info.valor}</div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4 mb-8">
+        {infoFuncionarios.map((info, index) => {
+          const Icon = info.icon;
+          return (
+            <div
+              key={index}
+              className="rounded-xl p-6 border bg-card border-border shadow-sm hover:shadow-md transition"
+            >
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-sm font-medium text-muted-foreground">{info.titulo}</h3>
+                <Icon className="w-5 h-5 text-foreground/60" />
               </div>
-            );
-          })}
-        </div>
-     
+              <div className="text-3xl font-bold mb-1">{info.valor}</div>
+            </div>
+          );
+        })}
+      </div>
+
 
       <div className="flex flex-col md:flex-row gap-2">
         <DropdownMenu>
@@ -353,26 +379,26 @@ export default function FuncionariosPage() {
 
       {/* Lista de Funcionários */}
       <ControlePaginacao
-        items={filteredFuncionarios}
+        items={funcionarios}
         renderItem={(funcionario) => (
           <CardFuncionarios
             key={funcionario.id}
             funcionario={funcionario}
             onEdit={handleEditFuncionario}
             onDelete={handleDeleteFuncionario}
-            roleNome={funcionario.role}
+            roleNome={funcionario.cargo}
             lojaNome={getLojaNome}
           />
         )}
-        itemsPerPage={9}
+        itemsPerPage={6}
       />
 
-      {filteredFuncionarios.length === 0 && (
+      {/* {filteredFuncionarios.length === 0 && (
         <div className="text-center py-12">
           <UserCircle className="h-12 w-12 text-muted-foreground mx-auto mb-4 opacity-50" />
           <p className="text-muted-foreground">Nenhum funcionário encontrado.</p>
         </div>
-      )}
+      )} */}
     </div>
   )
 }

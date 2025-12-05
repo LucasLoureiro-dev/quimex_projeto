@@ -21,17 +21,22 @@ export default function CardProdutos({
   onDelete,
   badgeVariant,
   nomeLoja,
-  lojaId
-})
-
-{ return (
+  lojaId,
+}) {
+  return (
     <Card className="group hover:shadow-lg transition-all duration-200 hover:border-primary/50">
       <CardHeader className="flex flex-col ">
         <div className="w-full rounded-md ">
-            <Image src={produto.image} layout="responsive" width={360} height={30} alt={`imagem do produto: ${produto.nome}`} className="aspeeo  object-  rounded-2xl" />
-          </div>
+          <Image
+            src={`http://localhost:8080${produto.imagem}`}
+            layout="responsive"
+            width={360}
+            height={30}
+            alt={`imagem do produto: ${produto.nome}`}
+            className="aspeeo  object-  rounded-2xl"
+          />
+        </div>
         <div className="flex items-start justify-between gap-3 flex-wrap">
-
           <div className="flex items-center gap-3 flex-shrink min-w-0 flex-wrap">
             <div className="p-2.5 rounded-xl bg-green-500/10 group-hover:bg-green-500/20 transition-colors">
               <Package className="h-5 w-5 text-green-500" />
@@ -39,11 +44,10 @@ export default function CardProdutos({
             <div className="flex-1 min-w-0">
               <CardTitle className="text-lg truncate">{produto.nome}</CardTitle>
               <p className="text-xs text-muted-foreground mt-1 line-clamp-1">
-                descrição
+                {produto.descricao}
               </p>
             </div>
           </div>
-          
         </div>
       </CardHeader>
       <CardContent className="space-y-3">
@@ -59,14 +63,18 @@ export default function CardProdutos({
             </span>
           </div>
           <Badge variant={badgeVariant(produto.estoque)}>
-            Estoque: {produto.estoque}
+            Estoque: {produto.quantidade}
           </Badge>
         </div>
-        
+
         <div className="flex flex-row justify-between items-center pt-2 border-t">
-          <div className={`flex items-center gap-2 px-4 py-1.5 rounded-md text-sm font-medium transition-all border
-              border-border bg-background text-background-foreground hover:bg-background/80`}>
-            <span className={`w-3.5 h-3.5 rounded-full ${produto.codigoCor} border border-border`}></span>
+          <div
+            className={`flex items-center gap-2 px-4 py-1.5 rounded-md text-sm font-medium transition-all border
+              border-border bg-background text-background-foreground hover:bg-background/80`}
+          >
+            <span
+              className={`w-3.5 h-3.5 rounded-full ${produto.codigoCor} border border-border`}
+            ></span>
             <span>{produto.classificacao}</span>
           </div>
           <div className="flex flex-wrap gap-1">
@@ -74,7 +82,8 @@ export default function CardProdutos({
               variant="ghost"
               size="icon"
               onClick={() => onEdit(produto)}
-              className="h-8 w-8 text-muted-foreground hover:text-white hover:bg-primary/10">
+              className="h-8 w-8 text-muted-foreground hover:text-white hover:bg-primary/10"
+            >
               <Edit2 className="h-4 w-4" />
             </Button>
             <AlertDialog>
@@ -105,7 +114,7 @@ export default function CardProdutos({
                   </AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>
-            </AlertDialog>            
+            </AlertDialog>
           </div>
         </div>
       </CardContent>

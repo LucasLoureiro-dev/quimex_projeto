@@ -58,7 +58,7 @@ export function ControlePaginacao({
   if (items.length === 0) {
     return (
       <div className="flex flex-col gap-3 text-center py-12 text-muted-foreground items-center">
-         <Image width={66} height={66} src={"/logo-verde.png"} alt='logo_quimex' />
+         <Image width={66} height={66} src={"/logo/logo-verde.png"} alt='logo_quimex' />
         Nenhum item encontrado
       </div>
     );

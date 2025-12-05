@@ -1,8 +1,7 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { canManageLojas } from "@/lib/utils/permissions";
-import { mockLojas, mockUsers, mockFornecedores } from "@/lib/mock-data";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import LojaCard from "@/components/cards/cardLoja";
@@ -11,88 +10,142 @@ import Tabela from "@/components/tabelaPaginacao/tabelaPaginacao";
 import TabelaFornecedores from "@/components/tabelaFornecedores/tabelaFornecedores";
 
 export default function LojasPage() {
-  const [lojas, setLojas] = useState(mockLojas);
+  const [lojas, setLojas] = useState([]);
+  const [usuario, setUsuario] = useState([]);
+  const [funcionarios, setFuncionarios] = useState([])
+  const [fornecedores, setFornecedores] = useState([])
   const [searchTerm, setSearchTerm] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingLoja, setEditingLoja] = useState(null);
   const [formData, setFormData] = useState({
     nome: "",
-    nomeGerente: "",
-    cpfGerente: "",
-    id: "",
     cnpj: "",
-    endereco: "",
-    cidade: "",
+    tipo: "",
+    localizacao: "",
     estado: "",
-    telefone: "",
-    tipo: "filial",
+    contato: "",
+    horario_abrtura: "",
+    horario_fechamento: "",
   });
+
+  useEffect(() => {
+    const buscaUsuarioLogado = async () => {
+      const busca_usuario_logado = await fetch("http://localhost:8080/dashboard",
+        {
+          credentials: "include"
+        }
+      )
+      const res = await busca_usuario_logado.json();
+      const usuarioBuscado = res
+      return usuarioBuscado;
+    }
+    const buscaUsuarios = async () => {
+      const busca_usuario = await fetch("http://localhost:8080/usuarios",
+        {
+          credentials: "include"
+        }
+      )
+      const res = await busca_usuario.json();
+      const usuariosBuscados = res
+      return usuariosBuscados;
+    }
+    const buscaFornecedores = async () => {
+      const busca_fornecedores = await fetch("http://localhost:8080/fornecedores",
+        {
+          credentials: "include"
+        }
+      )
+      const res = await busca_fornecedores.json();
+      const fornecedoresBuscados = res.fornecedores
+      return fornecedoresBuscados;
+    }
+
+    const filtraLojas = async () => {
+      const usuarioLogado = await buscaUsuarioLogado()
+      const usuarios = await buscaUsuarios()
+      const fornecedoresBuscados = await buscaFornecedores();
+
+      const busca_lojas = await fetch("http://localhost:8080/lojas");
+
+      const res = await busca_lojas.json();
+
+      const lojasBuscadas = res.lojas;
+      console.log(fornecedoresBuscados)
+
+      const loja_usuario = lojasBuscadas.find(l => l.id === usuarioLogado.Loja_vinculada)
+      const funcionarios = usuarios.filter(u => u.loja_vinculada === loja_usuario.id)
+      const fornecedores = fornecedoresBuscados.filter(f => f.loja_vinculada === loja_usuario.id)
+
+      setLojas(loja_usuario);
+      setUsuario(usuarios);
+      setFuncionarios(funcionarios)
+      setFornecedores(fornecedores)
+    };
+    filtraLojas();
+  }, []);
+
+  console.log(funcionarios)
 
   const handleEditLoja = (loja) => {
     setEditingLoja(loja);
     setFormData({
       nome: loja.nome,
-      nomeGerente: loja.gerenteLoja,
-      cpfGerente: loja.cpfGerente,
       cnpj: loja.cnpj,
-      endereco: loja.endereco,
-      cidade: loja.cidade,
+      localizacao: loja.localizacao,
       estado: loja.estado,
-      telefone: loja.telefone,
+      contato: loja.contato,
       tipo: loja.tipo,
+      horario_abertura: loja.horario_abertura,
+      horario_fechamento: loja.horario_fechamento,
     });
     setIsDialogOpen(true);
   };
 
-  const handleSaveLoja = () => {
+  const handleSaveLoja = async () => {
     if (editingLoja) {
-      setLojas(
-        lojas.map((l) =>
-          l.id === editingLoja.id
-            ? {
-                ...l,
-                nome: formData.nome,
-                nomeGerente: formData.nomeGerente,
-                cpfGerente: formData.cpfGerente,
-                cnpj: formData.cnpj,
-                endereco: formData.endereco,
-                cidade: formData.cidade,
-                estado: formData.estado,
-                telefone: formData.telefone,
-                tipo: formData.tipo,
-              }
-            : l
-        )
-      );
+      console.log(editingLoja);
+
+      await fetch(`http://localhost:8080/lojas/${editingLoja.id}`, {
+        method: "PUT",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          nome: formData.nome,
+          cnpj: formData.cnpj,
+          localizacao: formData.localizacao,
+          estado: formData.estado,
+          contato: formData.contato,
+          tipo: formData.tipo,
+          horario_abertura: formData.horario_abertura,
+          horario_fechamento: formData.horario_fechamento,
+        }),
+      });
     } else {
-      const newLoja = {
-        id: String(Date.now()),
-        nome: formData.nome,
-        nomeGerente: formData.nomeGerente,
-        cpfGerente: formData.cpfGerente,
-        cnpj: formData.cnpj,
-        endereco: formData.endereco,
-        cidade: formData.cidade,
-        estado: formData.estado,
-        telefone: formData.telefone,
-        tipo: formData.tipo,
-        ativo: true,
-      };
-      setLojas([...lojas, newLoja]);
+      console.log(formData);
+
+      await fetch("http://localhost:8080/lojas", {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
     }
 
     setIsDialogOpen(false);
     setEditingLoja(null);
     setFormData({
       nome: "",
-      nomeGerente: "",
-      cpfGerente: "",
       cnpj: "",
-      endereco: "",
-      cidade: "",
+      localizacao: "",
       estado: "",
-      telefone: "",
+      contato: "",
       tipo: "filial",
+      horario_abertura: "",
+      horario_fechamento: "",
     });
   };
 
@@ -123,48 +176,6 @@ export default function LojasPage() {
     }
   };
 
-  const tipoLoja = [
-    ...new Set(mockLojas.map((loja) => loja.tipo.toLowerCase())),
-  ];
-  const [tipoLojaSelecionados, setTipoLojaSelecionados] = useState([]);
-
-  const handleLojaChange = (loja, checked) => {
-    loja;
-    if (checked) {
-      setTipoLojaSelecionados([...tipoLojaSelecionados, loja]);
-    } else {
-      setTipoLojaSelecionados(tipoLojaSelecionados.filter((l) => l !== loja));
-    }
-  };
-  const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1);
-
-  const filteredLojas = useMemo(() => {
-    // Comece com a lista completa
-    let listaFiltrada = lojas;
-
-    if (tipoLojaSelecionados.length > 0) {
-      listaFiltrada = listaFiltrada.filter((loja) =>
-        tipoLojaSelecionados.includes(loja.tipo.toLowerCase())
-      );
-    }
-
-    //filtrar resultados
-    if (searchTerm.trim() !== "") {
-      const lowerCaseSearch = searchTerm.toLowerCase();
-      listaFiltrada = listaFiltrada.filter(
-        (loja) =>
-          loja.nome.toLowerCase().includes(lowerCaseSearch) ||
-          loja.estado.toLowerCase().includes(lowerCaseSearch) ||
-          loja.cidade.toLowerCase().includes(lowerCaseSearch) ||
-          loja.endereco.toLowerCase().includes(lowerCaseSearch)
-      );
-    }
-    // lista final filtrada
-    return listaFiltrada;
-
-    // O 'useMemo' só vai rodar esta lógica quando um destes 3 estados mudar.
-  }, [lojas, tipoLojaSelecionados, searchTerm]);
-
   return (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row justify-between items-start gap-4">
@@ -177,12 +188,12 @@ export default function LojasPage() {
       </div>
       <div className="max-w-5xl mx-auto">
         <LojaCard
-          nomeGerente="batman"
-          filial="Sudeste"
-          cnpj="12351312"
-          cidade="São Caetano"
-          estado="São Paulo"
-          contato="11-2131312"
+          nomeGerente={usuario.usuario}
+          filial={lojas.nome}
+          cnpj={lojas.cnpj}
+          cidade={lojas.localizacao}
+          estado={lojas.estado}
+          contato={lojas.contato}
         />
       </div>
       <div className="rounded-lg bg-muted px-3 py-3">
@@ -192,10 +203,10 @@ export default function LojasPage() {
             <TabsTrigger value="gerenciarFornecedores">Gerenciar Fornecedores</TabsTrigger>
           </TabsList>
           <TabsContent value="gerenciarFuncionarios">
-            <Tabela data={mockUsers} />
+            <Tabela data={funcionarios} />
           </TabsContent>
           <TabsContent value="gerenciarFornecedores">
-            <TabelaFornecedores data={mockFornecedores} />
+            <TabelaFornecedores data={fornecedores} />
           </TabsContent>
         </Tabs>
       </div>

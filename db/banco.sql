@@ -42,34 +42,21 @@ create table fornecedores(
     contato varchar(255) not null,
     localizacao varchar(255) not null,
     cnpj varchar(255) not null,
+    setor varchar(255),
+    email varchar(255),
+    telefone varchar(255),
     loja_vinculada int not null,
-    foreign key (loja_vinculada) references lojas(id),
-    tipo_produto varchar(32)
+    foreign key (loja_vinculada) references lojas(id)
 );
-
-INSERT INTO fornecedores (nome, contato, localizacao, cnpj, loja_vinculada, tipo_produto) VALUES
-('Almeida Distribuidora', '11987654321', 'São Paulo - SP', '12845796000145', 7, 'Materia prima'),
-('Rodrigues & Filhos', '21988776655', 'Rio de Janeiro - RJ', '55412896000122', 3, 'Industrializado'),
-('Comercial Santana', '31999887766', 'Belo Horizonte - MG', '77845632000199', 12, 'Materia prima'),
-('Silva Importados', '41988775544', 'Curitiba - PR', '99587412000133', 18, 'Industrializado'),
-('Mendes Suprimentos', '51977665544', 'Porto Alegre - RS', '22145876000111', 9, 'Materia prima'),
-('Global Fornecimentos', '71988774455', 'Salvador - BA', '99874125000188', 4, 'Industrializado'),
-('Norte Serviços Industriais', '92988773344', 'Manaus - AM', '45781236000166', 16, 'Materia prima'),
-('Santos Materiais', '61988776644', 'Brasília - DF', '78932145000155', 1, 'Industrializado'),
-('Ferreira Produtos Químicos', '11966554433', 'São Paulo - SP', '12378965000144', 11, 'Materia prima'),
-('Oliveira Metalúrgica', '21955443322', 'Rio de Janeiro - RJ', '65897432000111', 21, 'Industrializado'),
-('Martins Alimentos', '31944332211', 'Belo Horizonte - MG', '33451277000122', 14, 'Materia prima'),
-('Costa Têxteis', '41933221100', 'Curitiba - PR', '99123456000177', 5, 'Industrializado'),
-('Gomes Embalagens', '51922110099', 'Porto Alegre - RS', '55478963000166', 20, 'Materia prima'),
-('Alpha Suprimentos', '71911009876', 'Salvador - BA', '11223344000199', 2, 'Industrializado'),
-('RJ Forn. Industriais', '92900998877', 'Manaus - AM', '99887766000155', 17, 'Materia prima'),
-('União Comercial', '61988779966', 'Brasília - DF', '66554433000122', 6, 'Industrializado'),
-('Imperial Distribuição', '11977889955', 'São Paulo - SP', '88776655000188', 10, 'Materia prima'),
-('Delta Components', '21988997766', 'Rio de Janeiro - RJ', '44556677000111', 13, 'Industrializado'),
-('Nacional Materiais', '31966778899', 'Belo Horizonte - MG', '22334455000133', 8, 'Materia prima'),
-('Sul Indústria', '41955667788', 'Curitiba - PR', '11445566000177', 15, 'Industrializado'),
-('Prime Supply', '51944556677', 'Porto Alegre - RS', '77889922000144', 19, 'Materia prima');
-
+insert into fornecedores ( nome,
+    contato,
+    localizacao,
+    telefone,
+    email,
+    cnpj,
+    setor,
+    loja_vinculada)
+    values ("Petrobras", "Janilson", "Ola - SP", "11965926890", "petrobras@gmail.com", "090412103456", "Bunda", "1");
 
 create table
     if not exists produtos_quimicos (

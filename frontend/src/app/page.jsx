@@ -3,7 +3,7 @@
 import "./styles/page.css";
 import Image from "next/image";
 
-import { Link } from 'react-scroll';
+import { Link } from "react-scroll";
 
 import Navbar02Page from "@/components/navbar-02/navbar-02";
 import Footer03Page from "@/components/footer-03/footer-03";
@@ -24,13 +24,16 @@ import {
 
 import { Input } from "../components/ui/input";
 import { Textarea } from "../components/ui/textarea";
-import { ArrowRight } from "lucide-react"
+import { ArrowRight } from "lucide-react";
 
 export default function Home() {
   return (
     <>
       <Navbar02Page></Navbar02Page>
-      <section id="hero" className="hero flex flex-row items-center justify-center text-white text-center my-5 py-[8rem]">
+      <section
+        id="hero"
+        className="hero flex flex-row items-center justify-center text-white text-center my-5 py-[8rem]"
+      >
         <div className="flex flex-col w-3/4 items-center justify-center gap-5 h-[15rem]">
           <h1 className="text-3xl">
             Inovação e Sustentabilidade em Soluções Químicas
@@ -41,13 +44,24 @@ export default function Home() {
             excelência.
           </p>
           <Button className="bg-accent btn-lg py-2 px-2">
-            <Link to="o-que-fazemos" smooth={true} duration={500} spy={true} offset={-70} >Saiba Mais Sobre Nós</Link>
+            <Link
+              to="o-que-fazemos"
+              smooth={true}
+              duration={500}
+              spy={true}
+              offset={-70}
+            >
+              Saiba Mais Sobre Nós
+            </Link>
           </Button>
         </div>
       </section>
 
       {/* O Que Fazemos / Vendemos Section */}
-      <section id="o-que-fazemos" className="o-que-fazemos flex flex-col items-center justify-center w-full px-6 py-10 md:py-16">
+      <section
+        id="o-que-fazemos"
+        className="o-que-fazemos flex flex-col items-center justify-center w-full px-6 py-10 md:py-16"
+      >
         <div className="flex flex-col items-center justify-center max-w-6xl w-full">
           <div className="flex flex-row gap-3 bg-accent p-2 items-center rounded-md mb-4">
             <svg
@@ -70,7 +84,6 @@ export default function Home() {
           </h2>
 
           <div className="flex flex-col md:flex-row md:flex-wrap gap-6 justify-center md:items-stretch w-full items-center">
-           
             <div className="flex-1 min-w-[250px] max-w-sm bg-secondary-foreground border border-accent rounded-md shadow-sm p-6 text-center transition-transform duration-300 hover:scale-105">
               <Image
                 className="p-1 mx-auto"
@@ -85,7 +98,6 @@ export default function Home() {
               </p>
             </div>
 
-  
             <div className="flex-1 min-w-[250px] max-w-sm bg-secondary-foreground border border-accent rounded-md shadow-sm p-6 text-center transition-transform duration-300 hover:scale-105">
               <Image
                 className="p-1 mx-auto"
@@ -96,11 +108,11 @@ export default function Home() {
               />
               <h3 className="font-bold mt-3">Inovadora</h3>
               <p className="text-sm mt-2">
-                Estamos sempre à frente, pesquisando novas tecnologias que redefinem o mercado.
+                Estamos sempre à frente, pesquisando novas tecnologias que
+                redefinem o mercado.
               </p>
             </div>
 
-        
             <div className="flex-1 min-w-[250px] max-w-sm bg-secondary-foreground border border-accent rounded-md shadow-sm p-6 text-center transition-transform duration-300 hover:scale-105">
               <Image
                 className="p-1 mx-auto"
@@ -152,7 +164,15 @@ export default function Home() {
               </div>
             </div>
             <Button variant={"default"} className="w-40">
-              <Link to="parcerias" smooth={true} duration={500} spy={true} offset={-100} href="#parcerias" className="btn btn-outline-secondary">
+              <Link
+                to="parcerias"
+                smooth={true}
+                duration={500}
+                spy={true}
+                offset={-100}
+                href="#parcerias"
+                className="btn btn-outline-secondary"
+              >
                 Nossos Parceiros
               </Link>
             </Button>
@@ -170,7 +190,10 @@ export default function Home() {
       </section>
 
       {/* Setores de Produtos Químicos Section */}
-      <section id="setores-produtos" className="setores-produtos flex flex-col items-center justify-center w-full px-6 py-10 md:py-16">
+      <section
+        id="setores-produtos"
+        className="setores-produtos flex flex-col items-center justify-center w-full px-6 py-10 md:py-16"
+      >
         <div className="flex flex-col items-center justify-center max-w-6xl w-full gap-7">
           <h2 className="text-4xl text-center font-bold">
             Setores de Produtos Químicos que Atendemos
@@ -189,9 +212,7 @@ export default function Home() {
             </div>
             <div className="product-sector-card flex flex-col justify-center items-center text-center text-white transition-all duration-300 ease-in-out">
               <div className="card-side card-frente rounded-xl card-industria flex flex-col justify-center h-full w-full absolute top-0 left-0 hover:rotate-y-180 rotate-y-none">
-                <h3 className="fw-bold text-3xl">
-                  Indústria e Transformação
-                </h3>
+                <h3 className="fw-bold text-3xl">Indústria e Transformação</h3>
               </div>
               <div className="card-side card-fundo rounded-xl flex flex-col justify-center h-full w-full bg-primary absolute top-0 left-0 backface-hidden rotate-y-[-180deg] hover:rotate-y-none">
                 <p className="card-text">
@@ -210,7 +231,7 @@ export default function Home() {
                   beleza.
                 </p>
               </div>
-            </div> 
+            </div>
             <div className="product-sector-card flex flex-col justify-center items-center text-center text-white transition-all duration-300 ease-in-out">
               <div className="card-side card-frente rounded-xl card-limpeza flex flex-col justify-center h-full w-full absolute top-0 left-0 hover:rotate-y-180 rotate-y-none">
                 <h3 className="fw-bold text-3xl">Limpeza e Saneamento</h3>
@@ -227,7 +248,10 @@ export default function Home() {
         </div>
       </section>
       {/* Marcas de Parceria Section */}
-      <section id="parcerias" className="parcerias flex flex-col justify-center items-center h-full m-10">
+      <section
+        id="parcerias"
+        className="parcerias flex flex-col justify-center items-center h-full m-10"
+      >
         <div className="flex flex-col h-full w-full max-w-6xl bg-accent p-10 gap-4">
           <h2 className="text-3xl text-center">Nossas Marcas Parceiras</h2>
           <div className="flex flex-col md:flex-row items-center justify-center text-center gap-6">
@@ -269,72 +293,95 @@ export default function Home() {
           </div>
           <div className="text-center">
             <Button>
-              <Link to="contato" smooth={true} duration={500} spy={true} offset={-70}>Seja Nosso Parceiro</Link>
+              <Link
+                to="contato"
+                smooth={true}
+                duration={500}
+                spy={true}
+                offset={-70}
+              >
+                Seja Nosso Parceiro
+              </Link>
             </Button>
           </div>
         </div>
       </section>
 
-      <section id="contato" className="flex flex-col md:flex-row items-center justify-center h-full mt-6 pt-15 pb-15">
+      <section
+        id="contato"
+        className="flex flex-col md:flex-row items-center justify-center h-full mt-6 pt-15 pb-15"
+      >
         <div className="flex flex-col gap-3 w-full md:w-1/3">
           <h2 className="text-primary font-bold">Entre em Contato</h2>
-            <p>
-              Estamos ansiosos para ouvir você e explorar novas oportunidades de
-              parceria.
-            </p>
-            <div>
-              <h4 className="text-primary font-bold">Email:</h4>
-              <p>Email@gmail?.com</p>
-            </div>
-            <div>
-              <h4 className="text-primary font-bold">Telefone:</h4>
-            <p>+1 2345-5643</p>
-            </div>           
-            <small>Disponível para contato de <span className="font-bold text-secondary"> Segunda a Sexta, 9h - 17h (BRT)</span></small>
-        </div> 
+          <p>
+            Estamos ansiosos para ouvir você e explorar novas oportunidades de
+            parceria.
+          </p>
+          <div>
+            <h4 className="text-primary font-bold">Email:</h4>
+            <p>Email@gmail?.com</p>
+          </div>
+          <div>
+            <h4 className="text-primary font-bold">Telefone:</h4>
+            <p>11 2345-5643</p>
+          </div>
+          <small>
+            Disponível para contato de
+            <span className="font-bold text-secondary">
+              Segunda a Sexta, 9h - 17h (BRT)
+            </span>
+          </small>
+        </div>
         <div className="flex flex-row px-4 pb-10 w-full md:w-1/2 bg-accent rounded-lg ">
+          <FieldGroup>
+            <FieldSet>
+              <FieldLegend></FieldLegend>
+              <FieldDescription></FieldDescription>
               <FieldGroup>
-                <FieldSet>
-                  <FieldLegend></FieldLegend>
-                  <FieldDescription></FieldDescription>
-                  <FieldGroup>
-                    <Field>
-                      <FieldLabel htmlFor="checkout-7j9-card-name-43j">
-                        Nome completo
-                      </FieldLabel>
-                      <Input id="" className="bg-background" placeholder="Seu nome" required />
-                    </Field>
-                    <Field>
-                      <FieldLabel htmlFor="checkout-7j9-card-number-uw1">
-                        Email
-                      </FieldLabel>
-                      <Input
-                        id="email"
-                        className="bg-background"
-                        placeholder="seu.email@exemplo.com"
-                        required
-                      />
-                    </Field>
-                  </FieldGroup>
-                </FieldSet>
-                <FieldSet>
-                  <FieldGroup>
-                    <Field>
-                      <FieldLabel htmlFor="checkout-7j9-optional-comments">
-                        Mensagem
-                      </FieldLabel>
-                      <Textarea
-                        id="mensagem"
-                        placeholder="Sua mensagem..."
-                        className="resize-none md:resize-y bg-background"
-                      />
-                    </Field>
-                  </FieldGroup>
-                </FieldSet>
-                <Field orientation="responsive">
-                  <Button type="submit">Enviar <ArrowRight /></Button>
+                <Field>
+                  <FieldLabel htmlFor="checkout-7j9-card-name-43j">
+                    Nome completo
+                  </FieldLabel>
+                  <Input
+                    id=""
+                    className="bg-background"
+                    placeholder="Seu nome"
+                    required
+                  />
+                </Field>
+                <Field>
+                  <FieldLabel htmlFor="checkout-7j9-card-number-uw1">
+                    Email
+                  </FieldLabel>
+                  <Input
+                    id="email"
+                    className="bg-background"
+                    placeholder="seu.email@exemplo.com"
+                    required
+                  />
                 </Field>
               </FieldGroup>
+            </FieldSet>
+            <FieldSet>
+              <FieldGroup>
+                <Field>
+                  <FieldLabel htmlFor="checkout-7j9-optional-comments">
+                    Mensagem
+                  </FieldLabel>
+                  <Textarea
+                    id="mensagem"
+                    placeholder="Sua mensagem..."
+                    className="resize-none md:resize-y bg-background"
+                  />
+                </Field>
+              </FieldGroup>
+            </FieldSet>
+            <Field orientation="responsive">
+              <Button type="submit">
+                Enviar <ArrowRight />
+              </Button>
+            </Field>
+          </FieldGroup>
         </div>
       </section>
       {/* Footer */}

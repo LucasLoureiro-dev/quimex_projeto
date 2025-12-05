@@ -14,6 +14,7 @@ import {
 } from "lucide-react"
 import { jsPDF } from "jspdf"
 import autoTable from "jspdf-autotable"
+import { VendasTable } from "@/components/vendasTable/vendasTable";
  
 //  Cores e estilos
 const COLOR_RECEITA = "text-[#0F703A]"
@@ -359,57 +360,16 @@ export default function FinancialDashboard() {
         </Card>
  
         {/*registros de venda do pdv*/}
-        <Card className="bg-card shadow-lg">
-          <CardHeader>
-            <CardTitle className="text-xl font-bold flex items-center gap-2">
-              <Receipt className={`h-5 w-5 ${COLOR_RECEITA}`} /> Histórico de Vendas PDV
-            </CardTitle>
-            <p className="text-sm text-muted-foreground">Registro automático de todas as vendas realizadas no PDV.</p>
-          </CardHeader>
-          <CardContent>
-            <div className="w-full">
-              <table className="w-full table-auto">
-                <thead>
-                  <tr className="border-b border-border bg-muted/20">
-                    <th className="text-left text-sm font-semibold text-muted-foreground py-3 px-2">Nº Venda</th>
-                    <th className="text-left text-sm font-semibold text-muted-foreground py-3">Itens Vendidos</th>
-                    <th className="text-left text-sm font-semibold text-muted-foreground py-3">Valor</th>
-                    <th className="text-left text-sm font-semibold text-muted-foreground py-3">Pagamento</th>
-                    <th className="text-left text-sm font-semibold text-muted-foreground py-3">Horário</th>
-                    <th className="text-left text-sm font-semibold text-muted-foreground py-3">Operador</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {vendasPdv.map((venda) => (
-                    <tr key={venda.id} className="border-b border-border text-sm hover:bg-muted/50">
-                      <td className="py-3 px-2 font-medium">#{venda.id}</td>
-                      <td className="py-3 truncate max-w-[150px] md:max-w-[250px]" title={venda.itens}>
-                        {venda.itens}
-                      </td>
-                      <td className={`py-3 ${COLOR_RECEITA} font-semibold`}>{formatCurrency(venda.valor)}</td>
-                      <td className="py-3">
-                        <span className="px-2 py-1 rounded-full bg-muted text-xs font-medium whitespace-nowrap">
-                          {venda.pagamento}
-                        </span>
-                      </td>
-                      <td className="py-3 text-muted-foreground whitespace-nowrap">
-                        <div className="flex items-center gap-1">
-                          <Clock className="h-3 w-3" /> {venda.horario}
-                        </div>
-                      </td>
-                      <td className="py-3">
-                        <div className="flex items-center gap-2 whitespace-nowrap">
-                          <User className="h-3 w-3 text-muted-foreground" />
-                          {venda.operador}
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </CardContent>
-        </Card>
+      <div className="bg-card gap-6 rounded-xl border shadow-lg py-card p-0">
+      <div className="max-w-6xl mx-auto">
+        <div className="flex flex-row items-center gap-3 p-2">
+          <Receipt className={`h-5 w-5 ${COLOR_RECEITA}`} /><h1 className="text-2xl font-bold">Histórico de Vendas PDV</h1>
+        </div>
+        <div className="bg-card border border-border rounded-lg p-4">
+          <VendasTable vendasPdv={vendasPdv} formatCurrency={formatCurrency} COLOR_RECEITA={COLOR_RECEITA} />
+        </div>
+      </div>
+    </div>
        
         {/*Modal Detalhes Estoque */}
         <Dialog open={modais.detalhes} onOpenChange={(v) => toggle('detalhes', v)}>

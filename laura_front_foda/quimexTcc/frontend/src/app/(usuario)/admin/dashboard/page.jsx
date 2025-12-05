@@ -2,19 +2,21 @@
  
 import { useEffect } from "react"
 import { useRouter } from "next/navigation"
-
+import { useAuth } from "@/app/contexts/auth-context";
 import { Package, ShoppingCart, Users, TrendingUp, Building2, Factory, FileText } from "lucide-react"
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,LineChart, Line, PieChart, Pie, Cell} from "recharts"
 import { jsPDF } from "jspdf"
 import autoTable from "jspdf-autotable"  // <---- IMPORTAÇÃO CORRETA
  
 export default function DashboardPage() {
-  const router = useRouter()
- 
-  useEffect(() => {
-    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches
-    document.documentElement.classList.toggle("dark", prefersDark)
-  }, [])
+  const { user, isLoading } = useAuth();
+    const router = useRouter();
+    useEffect(() => {
+      if (!isLoading && !user) {
+        router.push("/login");
+      }
+    }, [user, isLoading, router]);
+
  
   const colors = ["#20532A", "#0F703A", "#1B8742", "#279D49", "#2EAF4A", "#7CC472", "#BEE2B9"]
  
