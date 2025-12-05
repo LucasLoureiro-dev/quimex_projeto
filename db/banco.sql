@@ -344,3 +344,11 @@ troco float(15, 2),
 foreign key (loja) references lojas(id),
 foreign key (produto) references produtos(id)
 );
+
+CREATE TABLE chat (
+id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+de INT NOT NULL,              
+para INT NOT NULL,            
+conteudo TEXT NOT NULL,        
+horario DATETIME NOT NULL     
+);

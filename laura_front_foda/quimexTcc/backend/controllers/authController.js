@@ -23,7 +23,8 @@ const loginController = async (req, res) => {
       "Id": usuario.id,
       "Nome": usuario.nome,
       "Cargo": usuario.cargo,
-      "RE": usuario.RE
+      "Vinculo": usuario.vinculo,
+      "Loja_vinculada": usuario.loja_vinculada
     };
     res.json({ mensagem: "Login realizado com sucesso", cargo: usuario.cargo, nome: usuario.nome});
   } catch (error) {

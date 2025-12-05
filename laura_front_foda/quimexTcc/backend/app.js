@@ -14,6 +14,9 @@ import despesas from "./routes/despesasRotas.js";
 import controle_diario from "./routes/controle_diarioRotas.js";
 import transferencias from "./routes/tranferenciaRotas.js";
 import fornecedores from "./routes/fornecedoresRotas.js";
+import produtos from "./routes/produtosRotas.js"
+import uploads from "./routes/uploadsRotas.js"
+import path from "path";
 
 // 1. Carrega variáveis de ambiente PRIMEIRO
 dotenv.config();
@@ -54,6 +57,9 @@ app.use("/transferencias", transferencias);
 app.use("/controle_diario", controle_diario);
 app.use("/despesas", despesas);
 app.use("/fornecedores", fornecedores);
+app.use("/produtos", produtos);
+app.use("/api", uploads);
+app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 
 server
   .listen(porta, () => {

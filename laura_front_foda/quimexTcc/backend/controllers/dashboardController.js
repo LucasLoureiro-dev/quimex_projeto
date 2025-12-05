@@ -4,7 +4,8 @@ const dashboardController = async (req, res) => {
       id: req.session.usuario.Id,
       usuario: req.session.usuario.Nome,
       cargo: req.session.usuario.Cargo,
-      RE: req.session.usuario.RE,
+      vinculo: req.session.usuario.Vinculo,
+      Loja_vinculada: req.session.usuario.Loja_vinculada,
     });
   } catch (error) {
     console.error("Erro ao fazer login:", error);

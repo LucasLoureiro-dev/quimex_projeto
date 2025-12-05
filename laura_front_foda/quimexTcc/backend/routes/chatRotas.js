@@ -1,151 +1,119 @@
-// chatRotas.js
 import { Server } from "socket.io";
-import {
-  listarChat,
-  criarChat,
-  listarChatEntreUsuarios,
-} from "../models/Chat.js"; // ajuste caminho se necessário
+import { criarChat, listarChatEntreUsuarios } from "../models/Chat.js";
 
-// -----------------------------------------------------------------------------
-// Função auxiliar para converter ISO → formato DATETIME do MySQL
-// -----------------------------------------------------------------------------
-function formatToMySQLDatetime(value) {
-  try {
-    const date = value ? new Date(value) : new Date();
-    if (isNaN(date.getTime())) return null;
-
-    const Y = date.getFullYear();
-    const M = String(date.getMonth() + 1).padStart(2, "0");
-    const D = String(date.getDate()).padStart(2, "0");
-    const h = String(date.getHours()).padStart(2, "0");
-    const m = String(date.getMinutes()).padStart(2, "0");
-    const s = String(date.getSeconds()).padStart(2, "0");
-
-    return `${Y}-${M}-${D} ${h}:${m}:${s}`;
-  } catch (err) {
-    console.error("Erro ao formatar horário:", err);
-    return null;
-  }
+/** Formato DATETIME válido */
+function formatToMySQLDatetime(date) {
+  const d = new Date(date);
+  const Y = d.getFullYear();
+  const M = String(d.getMonth() + 1).padStart(2, "0");
+  const D = String(d.getDate()).padStart(2, "0");
+  const h = String(d.getHours()).padStart(2, "0");
+  const m = String(d.getMinutes()).padStart(2, "0");
+  const s = String(d.getSeconds()).padStart(2, "0");
+  return `${Y}-${M}-${D} ${h}:${m}:${s}`;
 }
 
-// -----------------------------------------------------------------------------
-// FUNÇÃO PRINCIPAL DO CHAT
-// -----------------------------------------------------------------------------
 export function startChat(server) {
   const io = new Server(server, {
     path: "/chat",
-    cors: { origin: "*" },
+    cors: { origin: "*" }
   });
 
-  // Lista de usuários online
-  // socket.id → { id, nome }
-  let onlineUsers = new Map();
+  const onlineUsers = new Map();
 
-  // envia lista atualizada para todos
-  function broadcastUsers() {
-    io.emit("users", Array.from(onlineUsers.values()));
-  }
+  const broadcastUsers = () => {
+    io.emit("users", [...onlineUsers.values()]);
+  };
 
-  // ---------------------------------------------------------------------------
-  // EVENTO: Conexão inicial
-  // ---------------------------------------------------------------------------
   io.on("connection", (socket) => {
-    console.log("🔵 Novo usuário conectado:", socket.id);
+    console.log("Socket conectado:", socket.id);
 
-    // -------------------------------------------------------------------------
-    // 1) Login do usuário (mantido, só aceita objeto)
-    // Esperado: socket.emit("usuario", { id: X, nome: "Fulano" })
-    // -------------------------------------------------------------------------
+    // LOGIN DO USUÁRIO
     socket.on("usuario", (userObj) => {
-      if (!userObj) return;
-      onlineUsers.set(socket.id, userObj);
+      const loja = Number(
+        userObj.loja_vinculada ??
+        userObj.Loja_vinculada ??
+        null
+      );
 
-      console.log("👤 Usuário logado:", userObj);
+      onlineUsers.set(socket.id, {
+        socketId: socket.id,
+        id: userObj.id,
+        nome: userObj.nome ?? userObj.usuario,
+        cargo: userObj.cargo,
+        vinculo: userObj.vinculo,
+        loja_vinculada: loja
+      });
+
       broadcastUsers();
     });
 
-    // -------------------------------------------------------------------------
-    // 2) MENSAGEM PÚBLICA (compatível com sua versão antiga)
-    // -------------------------------------------------------------------------
-    socket.on("msg", (data) => {
-      console.log("💬 Mensagem pública:", data);
-      io.emit("msg", data);
-    });
-
-    // -------------------------------------------------------------------------
-    // 3) MENSAGEM PRIVADA ENTRE USUÁRIOS
-    // data = { de, para, conteudo, horario? }
-    // -------------------------------------------------------------------------
-    socket.on("private_message", async (data) => {
+    // ENVIAR MENSAGEM PRIVADA
+    // chatRotas.js (trecho relevante - substitua o handler private_message pelo código abaixo)
+    socket.on("private_message", async (msg) => {
       try {
-        if (!data || !data.de || !data.para || !data.conteudo) {
-          console.warn("⚠️ private_message recebido com dados inválidos:", data);
-          return;
-        }
+        if (!msg || msg.de == null || msg.para == null || !msg.conteudo) return;
 
-        // Formatar horário corretamente
-        const horarioFmt = formatToMySQLDatetime(data.horario);
+        // se conteudo já for objeto (ex: front enviou {type:'file',...}), garantimos salvar string
+        const conteudoParaSalvar = typeof msg.conteudo === "string" ? msg.conteudo : JSON.stringify(msg.conteudo);
 
-        const payload = {
-          de: data.de,
-          para: data.para,
-          conteudo: data.conteudo,
-          horario: horarioFmt || formatToMySQLDatetime(),
-        };
+        const horario = formatToMySQLDatetime(msg.horario ?? new Date());
 
-        console.log("💾 Salvando mensagem privada:", payload);
+        await criarChat({
+          de: msg.de,
+          para: msg.para,
+          conteudo: conteudoParaSalvar,
+          horario,
+        });
 
-        // Salva no banco usando sua função existente
-        await criarChat(payload);
-
-        // Envia a mensagem apenas ao remetente e destinatário
-        for (const [sockId, u] of onlineUsers.entries()) {
-          const uId = typeof u === "object" ? u.id : u;
-          if (
-            String(uId) === String(payload.de) ||
-            String(uId) === String(payload.para)
-          ) {
+        // reenviar para sockets das lojas envolvidas
+        for (const [sockId, usr] of onlineUsers.entries()) {
+          if (usr.loja_vinculada == msg.de || usr.loja_vinculada == msg.para) {
             io.to(sockId).emit("private_message", {
-              de: payload.de,
-              para: payload.para,
-              conteudo: payload.conteudo,
-              horario: payload.horario,
+              de: msg.de,
+              para: msg.para,
+              conteudo: conteudoParaSalvar,
+              horario,
             });
           }
         }
       } catch (err) {
-        console.error("❌ Erro ao tratar private_message:", err);
+        console.error("Erro private_message (upload):", err);
       }
     });
 
-    // -------------------------------------------------------------------------
-    // 4) HISTÓRICO ENTRE DOIS USUÁRIOS
-    // data = { de, para }
-    // -------------------------------------------------------------------------
-    socket.on("request_chat_history", async (data) => {
-      try {
-        if (!data || !data.de || !data.para) {
-          socket.emit("chat_history", { messages: [] });
-          return;
+
+    // HISTÓRICO
+    socket.on("request_chat_history", async ({ de, para }) => {
+      const msgs = await listarChatEntreUsuarios(de, para);
+      socket.emit("chat_history", { messages: msgs });
+    });
+
+    // DIGITANDO
+    socket.on("typing_start", (data) => {
+      [...onlineUsers.entries()].forEach(([sid, u]) => {
+        if (u.loja_vinculada == data.para) {
+          io.to(sid).emit("typing", {
+            from: data.de,
+            typing: true
+          });
         }
-
-        console.log("📜 Pedindo histórico:", data);
-
-        const msgs = await listarChatEntreUsuarios(data.de, data.para);
-
-        socket.emit("chat_history", { messages: msgs });
-      } catch (err) {
-        console.error("❌ Erro ao listar histórico:", err);
-        socket.emit("chat_history", { messages: [] });
-      }
+      });
     });
 
-    // -------------------------------------------------------------------------
-    // 5) DESCONEXÃO
-    // -------------------------------------------------------------------------
-    socket.on("disconnect", () => {
-      console.log("⚫ Usuário desconectado:", socket.id);
+    socket.on("typing_stop", (data) => {
+      [...onlineUsers.entries()].forEach(([sid, u]) => {
+        if (u.loja_vinculada == data.para) {
+          io.to(sid).emit("typing", {
+            from: data.de,
+            typing: false
+          });
+        }
+      });
+    });
 
+    // DESCONECTOU
+    socket.on("disconnect", () => {
       onlineUsers.delete(socket.id);
       broadcastUsers();
     });
