@@ -22,8 +22,9 @@ const criar_usuarioController = async (req, res) => {
   try {
     const {
       nome,
+      email,
       cpf,
-      re,
+      RE,
       senha,
       contato,
       sexo,
@@ -32,12 +33,15 @@ const criar_usuarioController = async (req, res) => {
       loja_vinculada,
     } = req.body;
 
+    console.log(req.body)
+
     const senhaHasheada = await generateHashedPassword(senha)
 
     const data = {
       nome: nome,
+      email: email,
       cpf: cpf,
-      re: re,
+      RE: RE,
       senha: senhaHasheada,
       contato: contato,
       sexo: sexo,
@@ -57,6 +61,7 @@ const criar_usuarioController = async (req, res) => {
 };
 const update_usuarioController = async (req, res) => {
   try {
+    const {id} = req.params;
     const { nome, cpf, contato, sexo, cargo, vinculo, loja_vinculada } =
       req.body;
     const data = {
@@ -68,7 +73,8 @@ const update_usuarioController = async (req, res) => {
       vinculo: vinculo,
       loja_vinculada: loja_vinculada,
     };
-    const atualizaUsuario = await update_usuario(data);
+    console.log(id, data)
+    const atualizaUsuario = await update_usuario(id, data);
     return res.status(200).json({
       mensagem: "Usuário atualizado com sucesso!",
       affectedRows: atualizaUsuario.affectedRows,
@@ -80,9 +86,9 @@ const update_usuarioController = async (req, res) => {
 };
 const delete_usuarioController = async (req, res) => {
   try {
-    const { id } = req.body;
+    const { id } = req.params;
     const deleteUsuario = await delete_usuario(id);
-    return res.status(200).json({ mensagem: "Usuário deletado com sucesso!" });
+    return res.status(200).json({ deleteUsuario });
   } catch (err) {
     console.error("Erro ao deletar usuario: ", err);
     res.status(500).json({ mensagem: "Erro ao deletar usuario!", erro: err });

@@ -3,6 +3,8 @@
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/app/contexts/auth-context";
 import React, { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+// "../../../components/ui/button";
 import {
   Search,
   Filter,
@@ -13,19 +15,22 @@ import {
   Plus,
   Minus,
   Hexagon,
+  LogOut,
   FlaskConical,
   Palette,
   Check,
 } from "lucide-react";
+import { jsPDF } from "jspdf"
+import autoTable from "jspdf-autotable"
 
 const hexToRgb = (hex) => {
   const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
   return result
     ? {
-        r: parseInt(result[1], 16),
-        g: parseInt(result[2], 16),
-        b: parseInt(result[3], 16),
-      }
+      r: parseInt(result[1], 16),
+      g: parseInt(result[2], 16),
+      b: parseInt(result[3], 16),
+    }
     : { r: 255, g: 255, b: 255 };
 };
 
@@ -52,6 +57,7 @@ const PaintMixerModal = ({ onClose, onConfirm }) => {
     setRgb(newRgb);
     setColor(rgbToHex(newRgb.r, newRgb.g, newRgb.b));
   };
+
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
@@ -210,12 +216,11 @@ const PaintMixerModal = ({ onClose, onConfirm }) => {
                     value={rgb[channel]}
                     onChange={(e) => handleRgbChange(channel, e.target.value)}
                     className={`w-full h-2 rounded-lg appearance-none cursor-pointer 
-                      ${
-                        channel === "r"
-                          ? "bg-red-100 accent-red-500"
-                          : channel === "g"
-                            ? "bg-green-100 accent-green-500"
-                            : "bg-blue-100 accent-blue-500"
+                      ${channel === "r"
+                        ? "bg-red-100 accent-red-500"
+                        : channel === "g"
+                          ? "bg-green-100 accent-green-500"
+                          : "bg-blue-100 accent-blue-500"
                       }`}
                   />
                 </div>
@@ -238,84 +243,6 @@ const PaintMixerModal = ({ onClose, onConfirm }) => {
   );
 };
 
-// --- DADOS DOS PRODUTOS ---
-// const chemicalProducts = [
-//   // Novo Produto: Tinta Personalizável
-//   {
-//     id: "custom-paint-base", // ID base
-//     code: "QMX-TINTA",
-//     name: "Tinta Acrílica Premium (Personalizada)",
-//     price: 89.90,
-//     category: "Tintas",
-//     image: null, // Será gerado dinamicamente
-//     isCustom: true // Flag para ativar o modal
-//   },
-//   {
-//     id: "1",
-//     code: "QMX-001",
-//     name: "Ácido Sulfúrico 98%",
-//     price: 45.9,
-//     category: "Ácidos",
-//     image: "/sulfuric-acid-bottle.jpg",
-//   },
-//   {
-//     id: "2",
-//     code: "QMX-002",
-//     name: "Hidróxido de Sódio",
-//     price: 32.5,
-//     category: "Bases",
-//     image: "/sodium-hydroxide-bottle.jpg",
-//   },
-//   {
-//     id: "3",
-//     code: "QMX-003",
-//     name: "Álcool Etílico 99.5%",
-//     price: 28.9,
-//     category: "Solventes",
-//     image: "/ethanol-bottle.jpg",
-//   },
-//   {
-//     id: "4",
-//     code: "QMX-004",
-//     name: "Acetona PA",
-//     price: 35.0,
-//     category: "Solventes",
-//     image: "/acetone-bottle.jpg",
-//   },
-//   {
-//     id: "5",
-//     code: "QMX-005",
-//     name: "Cloreto de Sódio",
-//     price: 15.9,
-//     category: "Sais",
-//     image: "/sodium-chloride-bottle.jpg",
-//   },
-//   {
-//     id: "6",
-//     code: "QMX-006",
-//     name: "Peróxido de Hidrogênio",
-//     price: 22.5,
-//     category: "Oxidantes",
-//     image: "/hydrogen-peroxide-bottle.jpg",
-//   },
-//   {
-//     id: "7",
-//     code: "QMX-007",
-//     name: "Ácido Clorídrico 37%",
-//     price: 38.9,
-//     category: "Ácidos",
-//     image: "/hydrochloric-acid-bottle.jpg",
-//   },
-//   {
-//     id: "8",
-//     code: "QMX-008",
-//     name: "Carbonato de Cálcio",
-//     price: 18.5,
-//     category: "Sais",
-//     image: "/calcium-carbonate-bottle.jpg",
-//   },
-// ];
-
 const categories = [
   "Todos",
   "Tintas",
@@ -328,11 +255,22 @@ const categories = [
 
 // --- COMPONENTE PRINCIPAL (PDV) ---
 export default function QuimexPOS() {
-  const { user, isLoading } = useAuth();
+  useEffect(() => {
+    if (sessionStorage.getItem("reloaded") !== "true") {
+      sessionStorage.setItem("reloaded", "true");
+      window.location.reload();
+    }
+  }, []);
+  const { user, isLoading, logout } = useAuth();
   const router = useRouter();
   useEffect(() => {
-    if (!isLoading && !user) {
-      router.push("/login");
+    if (user) {
+      if (!isLoading && !user) {
+        router.push("/login");
+      }
+      else if (user.cargo != "Funcionario") {
+        router.push("/login");
+      }
     }
   }, [user, isLoading, router]);
   const [cart, setCart] = useState([]);
@@ -340,6 +278,7 @@ export default function QuimexPOS() {
   const [selectedCategory, setSelectedCategory] = useState("Todos");
   const [showPayment, setShowPayment] = useState(false);
   const [chemicalProducts, setChemicalProducts] = useState([]);
+  const [method, setMethod] = useState("")
 
   useEffect(() => {
     if (user) {
@@ -351,7 +290,7 @@ export default function QuimexPOS() {
         })
         .then((data) => {
           const customItem = {
-            id: "custom-paint-base",
+            id: 1,
             sku: "QMX-TINTA",
             nome: "Tinta Acrílica Premium (Personalizada)",
             preco: 89.9,
@@ -360,7 +299,7 @@ export default function QuimexPOS() {
             isCustom: true,
           };
           const items = data.produtos.filter(
-            (item) => item.filial == user.Loja_vinculada
+            (item) => item.filial == user.Loja_vinculada && item.id != 1
           );
           setChemicalProducts([customItem, ...(items || [])]);
         });
@@ -373,13 +312,13 @@ export default function QuimexPOS() {
 
   const filteredProducts = chemicalProducts
     ? chemicalProducts.filter((product) => {
-        const matchesSearch =
-          product.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          product.sku.toLowerCase().includes(searchTerm.toLowerCase());
-        const matchesCategory =
-          selectedCategory === "Todos" || product.category === selectedCategory;
-        return matchesSearch && matchesCategory;
-      })
+      const matchesSearch =
+        product.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        product.sku.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesCategory =
+        selectedCategory === "Todos" || product.category === selectedCategory;
+      return matchesSearch && matchesCategory;
+    })
     : null;
 
   const initiateAddToCart = (product) => {
@@ -397,7 +336,7 @@ export default function QuimexPOS() {
       // Ex: Tintas vermelhas separadas de tintas azuis
       const customProduct = {
         ...tempProduct,
-        id: `${tempProduct.id}-${selectedColor}`,
+        id: `${tempProduct.id}`,
         name: `${tempProduct.name} - ${selectedColor.toUpperCase()}`,
         selectedColor: selectedColor, // Propriedade especial para renderizar no carrinho
       };
@@ -440,8 +379,11 @@ export default function QuimexPOS() {
   const total = cart.reduce((sum, item) => sum + item.preco * item.quantity, 0);
 
   const handlePayment = async (method) => {
+
+    const ts = Date.now();
     // const turnoId = sessionStorage.getItem("turnoId");
     // const operador = localStorage.getItem("usuarioLogado");
+
 
     cart.forEach((produto) => {
       fetch("http://localhost:8080/produtos", {
@@ -452,7 +394,7 @@ export default function QuimexPOS() {
         })
         .then((data) => {
           const customItem = {
-            id: "custom-paint-base",
+            id: 1,
             sku: "QMX-TINTA",
             nome: "Tinta Acrílica Premium (Personalizada)",
             preco: 89.9,
@@ -461,31 +403,47 @@ export default function QuimexPOS() {
             isCustom: true,
           };
           const items = data.produtos.filter(
-            (item) => item.filial == user.Loja_vinculada
+            (item) => item.filial == user.Loja_vinculada && item.id != 1
           );
           return [customItem, ...(items || [])];
         })
         .then((produtos) => {
-          const index = produtos.findIndex((item) => item.id === produto.id);
-          produto.quantidade = produtos[index].quantidade - produto.quantity;
-          const menos = produto.quantity;
-          fetch(`http://localhost:8080/produtos/${produto.id}`, {
-            credentials: "include",
-            headers: {
-              "content-type": "application/json",
-            },
-            method: "put",
-            body: JSON.stringify(produto),
-          }).then(() => {
-            setChemicalProducts((prevList) =>
-              prevList.map((item) =>
-                item.id === produto.id
-                  ? { ...item, quantidade: item.quantidade - menos }
-                  : item
-              )
-            );
-          });
+          if (!produto.isCustom) {
+            const index = produtos.findIndex((item) => item.id === produto.id);
+            produto.quantidade = produtos[index].quantidade - produto.quantity;
+            const menos = produto.quantity;
+            fetch(`http://localhost:8080/produtos/${produto.id}`, {
+              credentials: "include",
+              headers: {
+                "content-type": "application/json",
+              },
+              method: "put",
+              body: JSON.stringify(produto),
+            }).then(() => {
+              setChemicalProducts((prevList) =>
+                prevList.map((item) =>
+                  item.id === produto.id
+                    ? { ...item, quantidade: item.quantidade - menos }
+                    : item
+                )
+              );
+            });
+          }
         });
+      const doc = new jsPDF(); doc.text(`Comprovante`, 14, 20)
+      autoTable(doc, { startY: 30, head: [["Nome", "Quantidade", "Valor"]], body: cart.map(p => [p.nome, p.quantity, `R$ ${p.preco * p.quantity}`]), headStyles: { fillColor: [32, 83, 42] } })
+      doc.save(`comprovante.pdf`)
+
+      const date = new Date()
+
+      const pad = (n) => n.toString().padStart(2, '0');
+
+      const year = date.getFullYear();
+      const month = pad(date.getMonth() + 1);
+      const day = pad(date.getDate());
+      const hours = pad(date.getHours());
+      const minutes = pad(date.getMinutes());
+      const seconds = pad(date.getSeconds());
 
       fetch(`http://localhost:8080/transferencias`, {
         credentials: "include",
@@ -497,13 +455,18 @@ export default function QuimexPOS() {
           loja: user.Loja_vinculada,
           produto: produto.id,
           quantidade_produto: produto.quantity,
+          operador_id: user.id,
+          cart_id: `${user.id}${ts}`,
+          pagamento: method,
+          horario: `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`,
           preco: produto.preco,
           troco: 0,
         }),
       });
     });
 
-    alert(`Venda registrada com sucesso! Pagamento via ${method}.`);
+    setMethod(method)
+
     setCart([]);
     setShowPayment(false);
   };
@@ -544,6 +507,14 @@ export default function QuimexPOS() {
                     )}
                   </p>
                 </div>
+                <Button
+                  variant="ghost"
+                  className="w-full justify-start text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground"
+                  onClick={router.push("/vendedor/fecharCaixa")}
+                >
+                  <LogOut className="mr-3 h-5 w-5" />
+                  Fechar o caixa
+                </Button>
               </div>
             </div>
           </div>
@@ -570,11 +541,10 @@ export default function QuimexPOS() {
               <button
                 key={category}
                 onClick={() => setSelectedCategory(category)}
-                className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all whitespace-nowrap ${
-                  selectedCategory === category
-                    ? "bg-slate-800 text-white shadow-md"
-                    : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                }`}
+                className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all whitespace-nowrap ${selectedCategory === category
+                  ? "bg-slate-800 text-white shadow-md"
+                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                  }`}
               >
                 {category}
               </button>
@@ -587,23 +557,23 @@ export default function QuimexPOS() {
           <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {filteredProducts
               ? filteredProducts.map((product) => (
-                  <button
-                    key={product.id}
-                    onClick={() => initiateAddToCart(product)}
-                    className="group bg-white border border-gray-200 rounded-xl p-4 hover:border-green-500 hover:shadow-lg hover:shadow-green-500/10 transition-all text-left relative overflow-hidden flex flex-col h-full"
-                  >
-                    {/* Badge para produto customizável */}
-                    {product.isCustom && (
-                      <div className="absolute top-0 right-0 bg-green-600 text-white text-[10px] font-bold px-2 py-1 rounded-bl-lg z-10">
-                        PERSONALIZAR
-                      </div>
-                    )}
+                <button
+                  key={product.id}
+                  onClick={() => initiateAddToCart(product)}
+                  className="group bg-white border border-gray-200 rounded-xl p-4 hover:border-green-500 hover:shadow-lg hover:shadow-green-500/10 transition-all text-left relative overflow-hidden flex flex-col h-full"
+                >
+                  {/* Badge para produto customizável */}
+                  {product.isCustom && (
+                    <div className="absolute top-0 right-0 bg-green-600 text-white text-[10px] font-bold px-2 py-1 rounded-bl-lg z-10">
+                      PERSONALIZAR
+                    </div>
+                  )}
 
-                    <div className="w-full h-32 mb-4 rounded-lg bg-gray-50 flex items-center justify-center relative">
-                      {product.isCustom ? (
-                        // Ícone especial para o produto de tinta
-                        <Palette className="h-12 w-12 text-green-600 opacity-80 group-hover:scale-110 transition-transform" />
-                      ) : // Placeholder para produtos normais
+                  <div className="w-full h-32 mb-4 rounded-lg bg-gray-50 flex items-center justify-center relative">
+                    {product.isCustom ? (
+                      // Ícone especial para o produto de tinta
+                      <Palette className="h-12 w-12 text-green-600 opacity-80 group-hover:scale-110 transition-transform" />
+                    ) : // Placeholder para produtos normais
                       product.imagem ? (
                         <img
                           src={`http://localhost:8080${product.imagem}`}
@@ -613,26 +583,26 @@ export default function QuimexPOS() {
                       ) : (
                         <FlaskConical className="h-10 w-10 text-gray-300" />
                       )}
-                    </div>
+                  </div>
 
-                    <div className="flex-1 flex flex-col">
-                      <p className="text-[10px] text-gray-400 font-mono mb-1">
-                        {product.sku}
+                  <div className="flex-1 flex flex-col">
+                    <p className="text-[10px] text-gray-400 font-mono mb-1">
+                      {product.sku}
+                    </p>
+                    <h3 className="font-semibold text-sm text-gray-800 leading-tight mb-1 line-clamp-2">
+                      {product.nome}
+                    </h3>
+                    <div className="mt-auto flex items-end justify-between pt-2">
+                      <p className="text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded">
+                        {product.classificacao}
                       </p>
-                      <h3 className="font-semibold text-sm text-gray-800 leading-tight mb-1 line-clamp-2">
-                        {product.nome}
-                      </h3>
-                      <div className="mt-auto flex items-end justify-between pt-2">
-                        <p className="text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded">
-                          {product.classificacao}
-                        </p>
-                        <p className="text-lg font-bold text-slate-800">
-                          R$ {product.preco.toFixed(2)}
-                        </p>
-                      </div>
+                      <p className="text-lg font-bold text-slate-800">
+                        R$ {product.preco.toFixed(2)}
+                      </p>
                     </div>
-                  </button>
-                ))
+                  </div>
+                </button>
+              ))
               : null}
           </div>
         </div>
@@ -716,6 +686,7 @@ export default function QuimexPOS() {
                           {item.quantity}
                         </span>
                         <button
+                          disabled={item.quantity >= item.quantidade}
                           onClick={() => updateQuantity(item.id, 1)}
                           className="h-6 w-6 flex items-center justify-center rounded-md bg-white text-gray-600 shadow-sm hover:text-green-600 transition-colors"
                         >

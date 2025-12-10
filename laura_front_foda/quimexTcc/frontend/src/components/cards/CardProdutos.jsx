@@ -23,6 +23,7 @@ export default function CardProdutos({
   nomeLoja,
   lojaId,
 }) {
+  console.log(produto.imagem)
   return (
     <Card className="group hover:shadow-lg transition-all duration-200 hover:border-primary/50">
       <CardHeader className="flex flex-col ">

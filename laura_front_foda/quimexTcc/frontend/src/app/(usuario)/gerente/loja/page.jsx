@@ -77,14 +77,13 @@ export default function LojasPage() {
       const fornecedores = fornecedoresBuscados.filter(f => f.loja_vinculada === loja_usuario.id)
 
       setLojas(loja_usuario);
-      setUsuario(usuarios);
+      setUsuario(usuarioLogado);
       setFuncionarios(funcionarios)
       setFornecedores(fornecedores)
     };
     filtraLojas();
   }, []);
 
-  console.log(funcionarios)
 
   const handleEditLoja = (loja) => {
     setEditingLoja(loja);
@@ -187,6 +186,7 @@ export default function LojasPage() {
         </div>
       </div>
       <div className="max-w-5xl mx-auto">
+        {console.log(usuario)}
         <LojaCard
           nomeGerente={usuario.usuario}
           filial={lojas.nome}

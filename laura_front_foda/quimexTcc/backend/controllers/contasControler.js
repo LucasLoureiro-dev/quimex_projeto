@@ -12,16 +12,18 @@ const listar_contasController = async (req, res) => {
   }
 };
 
-const criar_contaController = async (data) => {
+const criar_contaController = async (req, res) => {
   try {
-    const { dados } = req.body;
+    const dados = req.body;
     const data = {
-      preco: dados.preco,
+      preco: dados.valor,
       tipo: dados.tipo,
-      loja: dados.loja,
+      loja: dados.filialId,
       descricao: dados.descricao,
       vencimento: dados.vencimento,
+      estado: "pendente"
     };
+    console.log(data, req.body);
     const criado = await criar_conta(data);
     res.status(200).json({ criado });
   } catch (err) {
@@ -32,17 +34,21 @@ const criar_contaController = async (data) => {
   }
 };
 
-const atualizar_contasController = async (data) => {
+const atualizar_contasController = async (req, res) => {
   try {
-    const { dados } = req.body;
+    const id = req.params.id;
+    const dados = req.body;
+    const date = new Date(dados.vencimento);
+    const mysqlDateTime = date.toISOString().slice(0, 19).replace("T", " ");
     const data = {
       preco: dados.preco,
       tipo: dados.tipo,
       loja: dados.loja,
       descricao: dados.descricao,
-      vencimento: dados.vencimento,
+      vencimento: mysqlDateTime,
+      estado: dados.estado
     };
-    const atualizado = await atualizar_conta(data);
+    const atualizado = await atualizar_conta(id, data);
     res.status(200).json({ atualizado });
   } catch (err) {
     console.error("Erro criando controle diário:", err);

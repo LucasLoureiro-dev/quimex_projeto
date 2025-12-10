@@ -37,13 +37,21 @@ import { ControlePaginacao } from "@/components/paginacao/controlePaginacao";
 import { CardFornecedor } from "@/components/cards/CardFornecedor";
 
 export default function FornecedoresPage() {
-    const { user, isLoading } = useAuth();
-    const router = useRouter();
-    useEffect(() => {
+  const { user, isLoading } = useAuth();
+  const router = useRouter();
+  useEffect(() => {
+    if (user) {
       if (!isLoading && !user) {
         router.push("/login");
       }
-    }, [user, isLoading, router]);
+      else if (user.cargo != "Administrador") {
+        router.push("/login");
+      }
+    }
+    else {
+      router.push("/login");
+    }
+  }, [user, isLoading, router]);
 
   // --- 1. MOVED ALL STATE HOOKS TO THE TOP ---
   const [fornecedores, setFornecedores] = useState([]); // Initialize as array to avoid map errors
@@ -82,7 +90,7 @@ export default function FornecedoresPage() {
     })
       .then((res) => res.json())
       .then((data) => {
-        setFornecedores(data.fornecedores || []);
+        setFornecedores(data.fornecedores.filter((fornecedor) => fornecedor.id != 1));
       });
 
     fetch("http://localhost:8080/lojas", {

@@ -40,7 +40,15 @@ export default function LojasPage() {
   const { user, isLoading } = useAuth();
   const router = useRouter();
   useEffect(() => {
-    if (!isLoading && !user) {
+    if (user) {
+      if (!isLoading && !user) {
+        router.push("/login");
+      }
+      else if (user.cargo != "Administrador") {
+        router.push("/login");
+      }
+    }
+    else {
       router.push("/login");
     }
   }, [user, isLoading, router]);

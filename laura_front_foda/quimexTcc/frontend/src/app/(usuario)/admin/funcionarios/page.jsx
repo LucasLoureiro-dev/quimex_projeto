@@ -1,8 +1,9 @@
+
 "use client"
 
 import { useRouter } from "next/navigation";
 import { useState, useMemo, useEffect } from "react"
-// import { useAuth } from "@/app/contexts/auth-context"
+import { useAuth } from "@/app/contexts/auth-context"
 import { mockUsers, mockLojas } from "@/lib/mock-data"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -36,7 +37,22 @@ import { ControlePaginacao } from "@/components/paginacao/controlePaginacao";
 import { CardFuncionarios } from "@/components/cards/CardFuncionarios";
 
 export default function FuncionariosPage() {
-  const [user, setUser] = useState({}) // Inicializado como objeto vazio
+  const { user, isLoading } = useAuth();
+  const router = useRouter();
+  useEffect(() => {
+    if (user) {
+      if (!isLoading && !user) {
+        router.push("/login");
+      }
+      else if (user.cargo != "Administrador") {
+        router.push("/login");
+      }
+    }
+    else {
+      router.push("/login");
+    }
+  }, [user, isLoading, router]);
+  // const [user, setUser] = useState({}) 
   const [funcionarios, setFuncionarios] = useState([])
   const [searchLojas, setSearchLojas] = useState([])
   const [lojas, setLojas] = useState([])
@@ -56,20 +72,6 @@ export default function FuncionariosPage() {
     sexo: "",
     vinculo: "",
   })
-
-  const usuario_logado = async () => {
-    try {
-      const user = await fetch("http://localhost:8080/dashboard", {
-        credentials: "include"
-      })
-      const userFound = await user.json()
-      setUser(userFound)
-    } catch (error) {
-      console.error("Erro ao buscar usuário logado:", error);
-      // Fallback para simulação
-      // setUser({ cargo: "Administrador", loja_vinculada: 1 });
-    }
-  }
 
   const busca_funcionarios = async () => {
     try {
@@ -93,7 +95,6 @@ export default function FuncionariosPage() {
 
 
   useEffect(() => {
-    usuario_logado()
     busca_funcionarios()
     buscaLojas()
   }, [])
@@ -265,7 +266,7 @@ export default function FuncionariosPage() {
     }
 
     return listaFiltrada;
-  }, [funcionarios, roleFuncionarioSelecionados, searchTerm, user.cargo, user.loja_vinculada]);
+  }, [funcionarios, roleFuncionarioSelecionados, searchTerm, user]);
 
   return (
     <div className="space-y-6">

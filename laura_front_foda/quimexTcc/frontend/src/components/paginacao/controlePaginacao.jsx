@@ -24,6 +24,8 @@ export function ControlePaginacao({
     setCurrentPage(1);
   }, [items.length]);
 
+  console.log(items)
+
   // Calcular índices dos cards
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;

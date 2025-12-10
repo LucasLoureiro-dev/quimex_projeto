@@ -17,16 +17,17 @@ const listar_despesasController = async (req, res) => {
   }
 };
 
-const criar_despesaController = async (data) => {
+const criar_despesaController = async (req, res) => {
   try {
-    const { dados } = req.body;
+    const dados = req.body;
     const data = {
-      loja: dados.funcionario,
-      valor: dados.abertura,
-      data: dados.fechamento,
-      descricao: dados.loja,
+      loja: dados.loja,
+      valor: dados.valor,
+      data: dados.data,
+      descricao: dados.descricao,
       tipo: dados.tipo,
     };
+    console.log(req.body, data)
     const criado = await criar_despesa(data);
     res.status(200).json({ criado });
   } catch (err) {
@@ -37,14 +38,15 @@ const criar_despesaController = async (data) => {
   }
 };
 
-const atualizar_despesasController = async (data) => {
+const atualizar_despesasController = async (req, res) => {
   try {
-    const { dados } = req.body;
+    const id = req.params.id;
+    const dados = req.body;
     const data = {
-      loja: dados.funcionario,
-      valor: dados.abertura,
-      data: dados.fechamento,
-      descricao: dados.loja,
+      loja: dados.loja,
+      valor: dados.valor,
+      data: dados.data,
+      descricao: dados.descricao,
       tipo: dados.tipo,
     };
     const atualizado = await atualizar_despesa(data);

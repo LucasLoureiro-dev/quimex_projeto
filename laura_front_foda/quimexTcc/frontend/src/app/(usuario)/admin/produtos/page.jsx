@@ -43,7 +43,15 @@ export default function ProdutosPage() {
   const { user, isLoading } = useAuth();
   const router = useRouter();
   useEffect(() => {
-    if (!isLoading && !user) {
+    if (user) {
+      if (!isLoading && !user) {
+        router.push("/login");
+      }
+      else if (user.cargo != "Administrador") {
+        router.push("/login");
+      }
+    }
+    else {
       router.push("/login");
     }
   }, [user, isLoading, router]);
@@ -77,7 +85,7 @@ export default function ProdutosPage() {
         return res.json();
       })
       .then((data) => {
-        setProdutos(data.produtos);
+        setProdutos(data.produtos.filter((produto) => produto.id != 1));
       });
 
     fetch("http://localhost:8080/lojas", {
@@ -164,20 +172,20 @@ export default function ProdutosPage() {
         produtos.map((p) =>
           p.id === editingProduto.id
             ? {
-                ...p,
-                id: data.id,
-                nome: data.nome,
-                codigo_de_barras: data.codigo_de_barras,
-                descricao: data.descricao,
-                classificacao: data.classificacao,
-                sku: data.sku,
-                preco: Number.parseFloat(data.preco),
-                quantidade: Number.parseInt(data.quantidade),
-                fornecedor: data.fornecedor,
-                codigoCor: data.codigoCor,
-                imagem: path.path,
-                filial: data.filial,
-              }
+              ...p,
+              id: data.id,
+              nome: data.nome,
+              codigo_de_barras: data.codigo_de_barras,
+              descricao: data.descricao,
+              classificacao: data.classificacao,
+              sku: data.sku,
+              preco: Number.parseFloat(data.preco),
+              quantidade: Number.parseInt(data.quantidade),
+              fornecedor: data.fornecedor,
+              codigoCor: data.codigoCor,
+              imagem: path.path,
+              filial: data.filial,
+            }
             : p
         )
       );
@@ -280,10 +288,10 @@ export default function ProdutosPage() {
   //visualizar por classificação
   const classificacao = produtos
     ? [
-        ...new Set(
-          produtos.map((produto) => produto.classificacao.toLowerCase())
-        ),
-      ]
+      ...new Set(
+        produtos.map((produto) => produto.classificacao.toLowerCase())
+      ),
+    ]
     : null;
 
   const [classificacaoSelecionados, setClassificacaoSelecionados] = useState(
@@ -477,10 +485,10 @@ export default function ProdutosPage() {
                       <SelectContent className="max-h-[300px]">
                         {lojas
                           ? lojas.map((loja) => (
-                              <SelectItem key={loja.id} value={loja.id}>
-                                {loja.nome}
-                              </SelectItem>
-                            ))
+                            <SelectItem key={loja.id} value={loja.id}>
+                              {loja.nome}
+                            </SelectItem>
+                          ))
                           : null}
                       </SelectContent>
                     </Select>
@@ -508,10 +516,10 @@ export default function ProdutosPage() {
                   <SelectContent className="max-h-[300px]">
                     {fornecedores
                       ? fornecedores.map((fornecedor) => (
-                          <SelectItem key={fornecedor.id} value={fornecedor.id}>
-                            {fornecedor.nome}
-                          </SelectItem>
-                        ))
+                        <SelectItem key={fornecedor.id} value={fornecedor.id}>
+                          {fornecedor.nome}
+                        </SelectItem>
+                      ))
                       : null}
                   </SelectContent>
                 </Select>
@@ -564,18 +572,18 @@ export default function ProdutosPage() {
             <DropdownMenuSeparator />
             {classificacao
               ? classificacao.map((classificacao) => (
-                  <DropdownMenuCheckboxItem
-                    checked={classificacaoSelecionados.includes(classificacao)}
-                    key={classificacao}
-                    onCheckedChange={(checked) =>
-                      handleClassificacaoChange(classificacao, checked)
-                    }
-                    // Prevent the dropdown menu from closing when the checkbox is clicked
-                    onSelect={(e) => e.preventDefault()}
-                  >
-                    {capitalize(classificacao)}
-                  </DropdownMenuCheckboxItem>
-                ))
+                <DropdownMenuCheckboxItem
+                  checked={classificacaoSelecionados.includes(classificacao)}
+                  key={classificacao}
+                  onCheckedChange={(checked) =>
+                    handleClassificacaoChange(classificacao, checked)
+                  }
+                  // Prevent the dropdown menu from closing when the checkbox is clicked
+                  onSelect={(e) => e.preventDefault()}
+                >
+                  {capitalize(classificacao)}
+                </DropdownMenuCheckboxItem>
+              ))
               : null}
           </DropdownMenuContent>
         </DropdownMenu>

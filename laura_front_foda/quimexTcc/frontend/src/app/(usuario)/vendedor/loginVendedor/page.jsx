@@ -19,6 +19,7 @@ import {
 import Link from "next/link"
 
 export default function CaixaUnico() {
+  
   const router = useRouter();
   const nomeCaminho = usePathname();
 
@@ -60,25 +61,25 @@ export default function CaixaUnico() {
   // -------------------------
   // 1️⃣ LOGIN
   // -------------------------
-  const verificarLogin = () => {
-    const usuarios = [
-      { user: "lucas", pass: "123", nome: "Lucas Loureiro" },
-      { user: "rafa", pass: "123", nome: "Rafaela" },
-    ];
+  // const verificarLogin = () => {
+  //   const usuarios = [
+  //     { user: "lucas", pass: "123", nome: "Lucas Loureiro" },
+  //     { user: "rafa", pass: "123", nome: "Rafaela" },
+  //   ];
 
-    const encontrado = usuarios.find(
-      (u) => u.user === login && u.pass === senha
-    );
+  //   const encontrado = usuarios.find(
+  //     (u) => u.user === login && u.pass === senha
+  //   );
 
-    if (!encontrado) {
-      setErroLogin("Login ou senha incorretos!");
-      return;
-    }
+  //   if (!encontrado) {
+  //     setErroLogin("Login ou senha incorretos!");
+  //     return;
+  //   }
 
-    localStorage.setItem("usuarioLogado", encontrado.nome);
-    setUsuario(encontrado.nome);
-    setEtapa("valor");
-  };
+  //   localStorage.setItem("usuarioLogado", encontrado.nome);
+  //   setUsuario(encontrado.nome);
+  //   setEtapa("valor");
+  // };
   
 
   // -------------------------
@@ -90,12 +91,11 @@ export default function CaixaUnico() {
       return;
     }
   
-    const response = await fetch("/api/caixa/abrir", {
+    const response = await fetch("http://localhost:8080/dashboard/caixa", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        operador: usuario,
-        valorInicial: parseFloat(valor),
+        valor: parseFloat(valor),
       }),
     });
   
@@ -105,11 +105,6 @@ export default function CaixaUnico() {
     }
   
     const dados = await response.json();
-  
-    // ✅ persistência correta
-    sessionStorage.setItem("turnoId", dados.id);
-    localStorage.setItem("caixaData", new Date().toISOString().split("T")[0]);
-    localStorage.setItem("usuarioLogado", usuario);
   
     setEtapa("caixa-aberto");
   };
@@ -143,8 +138,7 @@ export default function CaixaUnico() {
       }
     }
     else{
-      setLoading(false);
-      window.location.href = `/vendedor/pdv`;
+        setEtapa("valor");
     }
     const data = await res.json();
    

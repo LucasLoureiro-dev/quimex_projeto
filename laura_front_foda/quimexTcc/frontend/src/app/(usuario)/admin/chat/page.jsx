@@ -25,6 +25,22 @@ export default function ChatPage() {
   // ------------------------------
   // Scroll automático
   // ------------------------------
+
+  // const { user, isLoading } = useAuth();
+  // const router = useRouter();
+  // useEffect(() => {
+  //   if (user) {
+  //     if (!isLoading && !user) {
+  //       router.push("/login");
+  //     }
+  //     else if (user.cargo != "Administrador") {
+  //       router.push("/login");
+  //     }
+  //   }
+  //   else {
+  //     router.push("/login");
+  //   }
+  // }, [user, isLoading, router]);
   const scrollToBottom = () => {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
@@ -220,16 +236,6 @@ export default function ChatPage() {
       };
 
       socketRef.current.emit("private_message", payload);
-
-      setMessages((prev) => [
-        ...prev,
-        {
-          sender_id: payload.de,
-          receiver_id: payload.para,
-          message: JSON.stringify(fileMeta),
-          timestamp: payload.horario,
-        },
-      ]);
     } finally {
       setUploading(false);
       fileInputRef.current.value = "";
@@ -244,7 +250,7 @@ export default function ChatPage() {
     if (typeof content === "string") {
       try {
         parsed = JSON.parse(content);
-      } catch {}
+      } catch { }
     }
 
     if (parsed && parsed.type === "file") {
@@ -298,11 +304,10 @@ export default function ChatPage() {
                 <button
                   key={loja.id}
                   onClick={() => openChat(loja)}
-                  className={`w-full p-3 rounded-lg flex justify-between items-center ${
-                    activeChat?.id === loja.id
-                      ? "bg-green-100"
-                      : "bg-gray-100 hover:bg-gray-200"
-                  }`}
+                  className={`w-full p-3 rounded-lg flex justify-between items-center ${activeChat?.id === loja.id
+                    ? "bg-green-100"
+                    : "bg-gray-100 hover:bg-gray-200"
+                    }`}
                 >
                   <div>
                     <div className="font-medium">{loja.nome}</div>
@@ -335,11 +340,10 @@ export default function ChatPage() {
             {messages.map((m, i) => (
               <div
                 key={i}
-                className={`mb-3 max-w-[75%] p-3 rounded-xl break-words whitespace-pre-wrap overflow-hidden ${
-                  String(m.sender_id) === String(user.loja_vinculada)
-                    ? "ml-auto bg-green-600 text-white"
-                    : "#7CC472"
-                }`}
+                className={`mb-3 max-w-[75%] p-3 rounded-xl break-words whitespace-pre-wrap overflow-hidden ${String(m.sender_id) === String(user.loja_vinculada)
+                  ? "ml-auto bg-green-600 text-white"
+                  : "#7CC472"
+                  }`}
                 style={{ overflowWrap: "anywhere" }}
               >
                 <div className="text-xs opacity-70 mb-1">

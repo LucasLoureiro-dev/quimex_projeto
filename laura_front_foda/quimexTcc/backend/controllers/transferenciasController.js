@@ -14,16 +14,18 @@ const listar_transferenciasController = async (req, res) => {
 
 const criar_transferenciaController = async (req, res) => {
   try {
-    console.log(req.body)
     const dados  = req.body;
     const data = {
       loja: dados.loja,
       produto: dados.produto,
       quantidade_produto: dados.quantidade_produto,
+      operador_id: dados.operador_id,
+      horario: dados.horario,
+      cart_id: dados.cart_id,
+      pagamento: dados.pagamento,
       preco: dados.preco,
       troco: dados.troco,
     };
-    console.log(data)
     const criado = await criar_transferencia(data);
     res.status(200).json({ criado });
   } catch (err) {
@@ -38,12 +40,16 @@ const atualizar_transferenciaController = async (req, res) => {
   try {
     const dados = req.body;
     const data = {
-      loja: dados.funcionario,
-      valor: dados.abertura,
-      data: dados.fechamento,
-      descricao: dados.loja,
-      tipo: dados.tipo,
-    };
+      loja: dados.loja,
+      produto: dados.produto,
+      quantidade_produto: dados.quantidade_produto,
+      operador_id: dados.operador_id,
+      horario: dados.horario,
+      cart_id: dados.cart_id,
+      pagamento: dados.pagamento,
+      preco: dados.preco,
+      troco: dados.troco,
+    }
     const atualizado = await atualizar_transferencia(data);
     res.status(200).json({ atualizado });
   } catch (err) {

@@ -17,8 +17,7 @@ import {
 } from "@/components/ui/dialog"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
-import { Plus, Search, UserCircle, Users, UserRoundPlus, UserRoundMinus, ChartLine } from "lucide-react";
-// import { getRoleName } from "@/lib/utils/permissions";
+import { Plus, Search, Users } from "lucide-react";
 
 import {
   DropdownMenu,
@@ -38,27 +37,21 @@ export default function FuncionariosPage() {
   const [searchTerm, setSearchTerm] = useState("")
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [editingFuncionario, setEditingFuncionario] = useState(null)
+  const [usuario, setUsuario] = useState(null)
+  const [lojas, setLojas] = useState([])
+
   const [formData, setFormData] = useState({
     nome: "",
-    email: "",
     cpf: "",
+    email: "",
+    RE: "",
+    senha: "",
     telefone: "",
-    role: "vendedor",
-    lojaId: "",
+    sexo: "",
+    cargo: "Funcionario", // sempre funcionario
+    vinculo: "",
+    loja_vinculada: "",
   })
-
-
-  const infoFuncionarios = [{
-    titulo: "Total de Funcionários",
-    valor: "1,234",
-    icon: Users,
-  },
-  {
-    titulo: "Contratações esse mês",
-    valor: "1,234",
-    icon: UserRoundPlus,
-  },
-  ]
 
   const buscaUsuarioLogado = async () => {
     const busca_usuario_logado = await fetch("http://localhost:8080/dashboard",
@@ -67,8 +60,7 @@ export default function FuncionariosPage() {
       }
     )
     const res = await busca_usuario_logado.json();
-    const usuarioBuscado = res
-    return usuarioBuscado;
+    return res;
   }
 
   const buscaFuncionarios = async () => {
@@ -78,84 +70,136 @@ export default function FuncionariosPage() {
       }
     )
     const res = await busca_funcionarios.json();
-    const funcionariosBuscados = res
-    return funcionariosBuscados;
+    return res;
+  }
+
+  const buscaLojas = async () => {
+    try {
+      const r = await fetch("http://localhost:8080/lojas", { credentials: 'include' })
+      const data = await r.json()
+      // aceita tanto {lojas: [...]} quanto array direto
+      return data.lojas || data || []
+    } catch (e) {
+      return mockLojas || []
+    }
   }
 
   const filtraFuncionarios = async () => {
     const funcionarios = await buscaFuncionarios()
-    const usuario_logado = await buscaUsuarioLogado()
+    const usuarioLogado = await buscaUsuarioLogado()
 
-    const filtraFuncionarios = funcionarios.filter(f => f.loja_vinculada === usuario_logado.Loja_vinculada)
-    console.log(filtraFuncionarios)
-    setFuncionarios(filtraFuncionarios)
+    setUsuario(usuarioLogado)
+
+    // filtra por loja vinculada do usuário (gerente) - apenas os da mesma loja
+    const filtra = (funcionarios || []).filter(f => {
+      // se administrador, poderia ver todos — aqui assumimos gerente
+      return f.loja_vinculada === usuarioLogado.Loja_vinculada
+    })
+    setFuncionarios(filtra)
+
+    // seta valores padrão do form com dados do usuário (vinculo e loja)
+    setFormData((prev) => ({
+      ...prev,
+      vinculo: usuarioLogado.vinculo,
+      loja_vinculada: usuarioLogado.Loja_vinculada,
+      cargo: 'Funcionario',
+    }))
   }
 
   useEffect(() => {
-    filtraFuncionarios()
+    // carrega lojas e funcionários/usuario
+    (async () => {
+      const l = await buscaLojas()
+      setLojas(l)
+      await filtraFuncionarios()
+    })()
   }, [])
 
+  const infoFuncionarios = [{
+    titulo: "Total de Funcionários",
+    valor: funcionarios.length,
+    icon: Users,
+  },]
 
   const handleEditFuncionario = (funcionario) => {
     setEditingFuncionario(funcionario)
     setFormData({
-      nome: funcionario.nome,
-      email: funcionario.email,
-      cpf: funcionario.cpf,
-      telefone: funcionario.telefone,
-      role: funcionario.role,
-      lojaId: funcionario.lojaId || "",
+      nome: funcionario.nome || "",
+      email: funcionario.email || "",
+      cpf: funcionario.cpf || "",
+      telefone: funcionario.contato || "",
+      cargo: "Funcionario",
+      loja_vinculada: funcionario.loja_vinculada || usuario?.Loja_vinculada || "",
+      RE: funcionario.RE || "",
+      senha: "",
+      sexo: funcionario.sexo || "",
+      vinculo: funcionario.vinculo || usuario?.vinculo || "",
     })
     setIsDialogOpen(true)
   }
 
-  const handleSaveFuncionario = () => {
-    if (editingFuncionario) {
-      // Edit funcionario
-      setFuncionarios(
-        funcionarios.map((f) =>
-          f.id === editingFuncionario.id
-            ? {
-              ...f,
-              nome: formData.nome,
-              email: formData.email,
-              cpf: formData.cpf,
-              telefone: formData.telefone,
-              role: formData.role,
-              lojaId: formData.lojaId,
-            }
-            : f,
-        ),
-      )
-    } else {
-      // Add new
-      const newFuncionario = {
-        id: String(Date.now()),
-        nome: formData.nome,
-        email: formData.email,
-        cpf: formData.cpf,
-        telefone: formData.telefone,
-        role: formData.role,
-        lojaId: formData.lojaId,
-        ativo: true,
-      }
-      setFuncionarios([...funcionarios, newFuncionario])
+  const handleSaveFuncionario = async () => {
+    // sempre usa a loja do usuario logado
+    const lojaVinculadaFinal = usuario?.Loja_vinculada || formData.loja_vinculada
+
+    const payload = {
+      nome: formData.nome,
+      email: formData.email,
+      cpf: formData.cpf,
+      contato: formData.telefone,
+      cargo: 'Funcionario',
+      loja_vinculada: lojaVinculadaFinal,
+      RE: formData.RE,
+      senha: formData.senha,
+      sexo: formData.sexo,
+      vinculo: usuario?.vinculo || formData.vinculo,
     }
 
-    setIsDialogOpen(false)
-    setEditingFuncionario(null)
-    setFormData({
-      nome: "",
-      email: "",
-      cpf: "",
-      telefone: "",
-      role: "vendedor",
-      lojaId: "",
-    })
+    console.log(payload)
+
+    try {
+      if (editingFuncionario) {
+        await fetch(`http://localhost:8080/usuarios/${editingFuncionario.id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+          credentials: "include",
+        })
+      } else {
+        await fetch("http://localhost:8080/usuarios", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+          credentials: "include",
+        })
+      }
+    } catch (error) {
+      console.error(error)
+    } finally {
+      // recarrega lista
+      await filtraFuncionarios()
+      setIsDialogOpen(false)
+      setEditingFuncionario(null)
+      setFormData({
+        nome: "",
+        cpf: "",
+        email: "",
+        RE: "",
+        senha: "",
+        telefone: "",
+        sexo: "",
+        cargo: "Funcionario",
+        vinculo: usuario?.vinculo || "",
+        loja_vinculada: usuario?.Loja_vinculada || "",
+      })
+    }
   }
 
-  const handleDeleteFuncionario = (id) => {
-    setFuncionarios(funcionarios.filter((f) => f.id !== id))
+  const handleDeleteFuncionario = async (id) => {
+    await fetch(`http://localhost:8080/usuarios/${id}`, {
+      method: "DELETE",
+      credentials: "include"
+    })
   }
 
   const handleCloseDialog = (open) => {
@@ -164,58 +208,40 @@ export default function FuncionariosPage() {
       setEditingFuncionario(null)
       setFormData({
         nome: "",
-        email: "",
         cpf: "",
+        email: "",
+        RE: "",
+        senha: "",
         telefone: "",
-        role: "vendedor",
-        lojaId: "",
+        sexo: "",
+        cargo: "Funcionario",
+        vinculo: usuario?.vinculo || "",
+        loja_vinculada: usuario?.Loja_vinculada || "",
       })
     }
   }
 
   const getLojaNome = (lojaId) => {
     if (!lojaId) return "Matriz"
-    const loja = mockLojas.find((l) => l.id === lojaId)
+    const loja = lojas.find((l) => l.id === lojaId) || mockLojas.find((l) => l.id === lojaId)
     return loja?.nome || "N/A"
   }
 
-  const roleFuncionarios = [...new Set(mockUsers.map(user => user.role))];
-
-  const [roleFuncionarioSelecionados, setRoleFuncionarioSelecionados] = useState([]);
-
-  const handleRoleFuncionarioChange = (funcionario, checked) => {
-    if (checked) {
-      setRoleFuncionarioSelecionados([...roleFuncionarioSelecionados, funcionario]);
-    } else {
-      setRoleFuncionarioSelecionados(roleFuncionarioSelecionados.filter((f) => f !== funcionario));
-    }
-  };
-
-
   const filteredFuncionarios = useMemo(() => {
-    // Comece com a lista filtrada por role de acesso do usuário logado
     let listaFiltrada = funcionarios;
-    // Se houver algum setor (role) selecionado, filtra por ele
-    if (roleFuncionarioSelecionados.length > 0) {
-      listaFiltrada = listaFiltrada.filter(funcionario =>
-        roleFuncionarioSelecionados.includes(funcionario.role)
-      );
-    }
 
-    // Se houver texto na barra de busca, filtra por nome, email ou CPF
     if (searchTerm.trim() !== "") {
       const lowerCaseSearch = searchTerm.toLowerCase();
 
       listaFiltrada = listaFiltrada.filter(funcionario =>
-        funcionario.nome.toLowerCase().includes(lowerCaseSearch) ||
-        funcionario.email.toLowerCase().includes(lowerCaseSearch) ||
-        funcionario.cpf.toLowerCase().includes(searchTerm)
+        (funcionario.nome || "").toLowerCase().includes(lowerCaseSearch) ||
+        (funcionario.email || "").toLowerCase().includes(lowerCaseSearch) ||
+        (funcionario.cpf || "").includes(searchTerm)
       );
     }
 
-    // Retorna a lista final filtrada
     return listaFiltrada;
-  }, [roleFuncionarioSelecionados, searchTerm]);
+  }, [searchTerm, funcionarios]);
 
   return (
     <div className="space-y-6">
@@ -279,35 +305,72 @@ export default function FuncionariosPage() {
                 />
               </div>
 
+              <div className="space-y-2">
+                <Label htmlFor="RE">RE</Label>
+                <Input
+                  id="RE"
+                  value={formData.RE}
+                  onChange={(e) => setFormData({ ...formData, RE: e.target.value })}
+                  placeholder="Registro Escolar"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="senha">Senha</Label>
+                <Input
+                  id="senha"
+                  type="password"
+                  value={formData.senha}
+                  onChange={(e) => setFormData({ ...formData, senha: e.target.value })}
+                  placeholder="********"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="sexo">Sexo</Label>
+                <Select value={formData.sexo || ""} onValueChange={(v) => setFormData({ ...formData, sexo: v })}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Masculino">Masculino</SelectItem>
+                    <SelectItem value="Feminino">Feminino</SelectItem>
+                    <SelectItem value="Outro">Outro</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
               <div>
                 <div className="space-y-2">
-                  <Label htmlFor="role">Cargo</Label>
-                  <Select value={formData.role} onValueChange={(value) => setFormData({ ...formData, role: value })}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="admin_matriz">Administrador Matriz</SelectItem>
-                      <SelectItem value="gerente_filial">Gerente de Filial</SelectItem>
-                      <SelectItem value="vendedor">Vendedor</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <Label htmlFor="cargo">Cargo</Label>
+                  <Input id="cargo" value={formData.cargo} disabled />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="loja">Loja</Label>
-                  <Select
-                    value={formData.lojaId}
-                    onValueChange={(value) => setFormData({ ...formData, lojaId: value })}
-                  >
+                  <Label htmlFor="vinculo">Vínculo</Label>
+                  <Input id="vinculo" value={formData.vinculo || usuario?.vinculo || ""} disabled />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="loja">Loja Vinculada</Label>
+                  <Select value={String(formData.loja_vinculada || usuario?.Loja_vinculada || "")} disabled>
                     <SelectTrigger>
-                      <SelectValue placeholder="Selecione uma loja" />
+                      <SelectValue placeholder="Loja" />
                     </SelectTrigger>
                     <SelectContent>
-                      {mockLojas.map((loja) => (
-                        <SelectItem key={loja.id} value={loja.id}>
-                          {loja.nome}
-                        </SelectItem>
-                      ))}
+                      {(() => {
+                        const lojaId = usuario?.Loja_vinculada || formData.loja_vinculada
+                        const lojaInfo = lojas.find(l => l.id === lojaId) || mockLojas.find(l => l.id === lojaId)
+                        if (lojaInfo) {
+                          return (
+                            <SelectItem value={String(lojaInfo.id)}>
+                              {lojaInfo.nome}
+                            </SelectItem>
+                          )
+                        }
+                        return (
+                          <SelectItem value="0">Matriz</SelectItem>
+                        )
+                      })()}
                     </SelectContent>
                   </Select>
                 </div>
@@ -345,30 +408,10 @@ export default function FuncionariosPage() {
 
 
       <div className="flex flex-col md:flex-row gap-2">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="w-fit">Visualizar por função</Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-44">
-            <DropdownMenuLabel>Selecione função</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            {roleFuncionarios.map((funcionario) => (
-              <DropdownMenuCheckboxItem
-                checked={roleFuncionarioSelecionados.includes(funcionario)}
-                key={funcionario}
-                onCheckedChange={(checked) => handleRoleFuncionarioChange(funcionario, checked)}
-                // Prevent the dropdown menu from closing when the checkbox is clicked
-                onSelect={(e) => e.preventDefault()}
-              >
-                {funcionario}
-              </DropdownMenuCheckboxItem>
-            ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
         <div className="flex flex-row gap-2 flex-wrap relative w-full">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Buscar por nome, email ou CPF..."
+            placeholder="Buscar por nome ou CPF..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="pl-10"
@@ -377,9 +420,10 @@ export default function FuncionariosPage() {
       </div>
 
 
+
       {/* Lista de Funcionários */}
       <ControlePaginacao
-        items={funcionarios}
+        items={filteredFuncionarios}
         renderItem={(funcionario) => (
           <CardFuncionarios
             key={funcionario.id}
@@ -392,13 +436,6 @@ export default function FuncionariosPage() {
         )}
         itemsPerPage={6}
       />
-
-      {/* {filteredFuncionarios.length === 0 && (
-        <div className="text-center py-12">
-          <UserCircle className="h-12 w-12 text-muted-foreground mx-auto mb-4 opacity-50" />
-          <p className="text-muted-foreground">Nenhum funcionário encontrado.</p>
-        </div>
-      )} */}
     </div>
   )
 }

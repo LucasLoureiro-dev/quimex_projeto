@@ -23,9 +23,9 @@ const criar_usuario = async (data) => {
   }
 };
 
-const update_usuario = async (data) => {
+const update_usuario = async (id, data) => {
   try {
-    return await update("usuarios", data);
+    return await update("usuarios", data, `id = '${id}'`);
   } catch (err) {
     console.log(`Houve um erro atualizando usuário: ${err}`);
     throw new Error("Falha ao atualizar usuário");

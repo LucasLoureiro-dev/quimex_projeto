@@ -5,4 +5,22 @@ const router = express.Router();
 
 router.post('/', loginController);
 
+router.post('/logout', (req, res) => {
+
+  console.log('Usuário deslogando:', req.user?.username);
+
+  req.logout((err) => {
+    
+    req.session.destroy((destroyErr) => {
+      if (destroyErr) {
+        console.error('Erro ao destruir sessão:', destroyErr);
+        return res.status(500).json({ error: 'Erro ao encerrar sessão' });
+      }
+
+      res.clearCookie('connect.sid'); // Remove o cookie de sessão
+      res.json({ message: 'Logout realizado com sucesso' });
+    });
+  });
+});
+
 export default router;

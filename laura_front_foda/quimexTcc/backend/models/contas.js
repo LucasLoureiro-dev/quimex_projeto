@@ -23,9 +23,9 @@ const criar_conta = async (data) => {
   }
 };
 
-const atualizar_conta = async (id) => {
+const atualizar_conta = async (id, data) => {
   try {
-    return await update("contas", `id = '${id}'`);
+    return await update("contas", data, `id = '${id}'`);
   } catch (err) {
     console.log(`Houve um erro ao atualizar a contas: ${err}`);
     throw new Error("Falha ao atualizar a contas");

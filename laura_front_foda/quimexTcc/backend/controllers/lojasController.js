@@ -21,19 +21,23 @@ const criar_lojaController = async (req, res) => {
   try {
     const {
       nome,
+      cnpj,
       localizacao,
-      cep,
+      estado,
       contato,
+      tipo,
       horario_abertura,
       horario_fechamento,
     } = req.body;
     const data = {
       nome: nome,
+      cnpj: cnpj,
       localização: localizacao,
-      cep: cep,
+      estado: estado,
       contato: contato,
+      tipo: tipo,
       horario_abertura: horario_abertura,
-      horario_fenchamento: horario_fechamento,
+      horario_fechamento: horario_fechamento,
     };
     const criado = await criar_loja(data);
     res.status(200).json({ criado });
@@ -48,19 +52,23 @@ const atualizar_lojaController = async (req, res) => {
     const id = req.params.id;
     const {
       nome,
+      cnpj,
       localizacao,
-      cep,
+      estado,
       contato,
+      tipo,
       horario_abertura,
       horario_fechamento,
     } = req.body;
     const data = {
       nome: nome,
-      localização: localizacao,
-      cep: cep,
+      cnpj: cnpj,
+      localizacao: localizacao,
+      estado: estado,
       contato: contato,
+      tipo: tipo,
       horario_abertura: horario_abertura,
-      horario_fenchamento: horario_fechamento,
+      horario_fechamento: horario_fechamento,
     };
     const atualizado = await atualizar_loja(id, data);
     res.status(200).json({ atualizado });

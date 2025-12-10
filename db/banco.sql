@@ -3,15 +3,15 @@ create database quimex;
 use quimex;
  
 create table if not exists lojas (
-id int auto_increment primary key not null,
-nome varchar(255) not null,
-cnpj varchar(20) not null,
-tipo enum("Matriz", "Filial") not null,
-localizacao varchar(255) not null,
-estado varchar(255) not null,
-contato varchar(20) not null,
-horario_abertura time not null,
-horario_fechamento time not null
+	id int auto_increment primary key not null,
+	nome varchar(255) not null,
+	cnpj varchar(20) not null,
+	tipo enum("Matriz", "Filial") not null,
+	localizacao varchar(255) not null,
+	estado varchar(255) not null,
+	contato varchar(20) not null,
+	horario_abertura time not null,
+	horario_fechamento time not null
 );
 INSERT INTO lojas (nome, cnpj, tipo, localizacao, estado, contato, horario_abertura, horario_fechamento) VALUES
 ('Matriz', '12.345.678/0001-00', 'Matriz', 'Pindamonhangaba', 'São Paulo', '96592-6890', '00:00:00', '23:59:59'),
@@ -56,40 +56,44 @@ insert into fornecedores ( nome,
     cnpj,
     setor,
     loja_vinculada)
-    values ("Petrobras", "Janilson", "Ola - SP", "11965926890", "petrobras@gmail.com", "090412103456", "Bunda", "1");
-
-create table
-    if not exists produtos_quimicos (
-        id int not null auto_increment primary key,
-        nome varchar(255) not null,
-        composicao text not null,
-        preco float (11, 2) not null,
-        fornecedor int not null,
-        quantidade int not null,
-        codigoCor text not null,
-        imagem text not null,
-        filial text not null,
-        sku text not null,
-        classificacao text not null,
-        foreign key (fornecedor) references fornecedores (id)
-    );
+    values 
+    ("Quimex", "Arthur Y.", "Diademe - SP", "11954590773", "quimex@gmail.com", "099999999900", "tintas", "1"),
+    ("Petrobras", "Janilson", "Ola - SP", "11965926890", "petrobras@gmail.com", "090412103456", "Bunda", "1");
+		   
+           
+create table if not exists produtos_quimicos (
+	id int not null auto_increment primary key,
+	nome varchar(255) not null,
+	composicao text not null,
+	preco float (11, 2) not null,
+	fornecedor int not null,
+	quantidade int not null,
+	codigoCor text not null,
+	imagem text not null,
+	filial text not null,
+	sku text not null,
+	classificacao text not null,
+	foreign key (fornecedor) references fornecedores (id)
+);
  
-create table
-    if not exists produtos (
-        id int not null auto_increment primary key,
-        nome varchar(255) not null,
-        codigo_de_barras varchar(12) not null,
-        descricao varchar(255) not null,
-        preco float (11, 2) not null,
-        sku text not null,
-        quantidade int not null,
-        classificacao text not null,
-        fornecedor int not null,
-        codigoCor text not null,
-        imagem text not null,
-        filial text not null,
-        foreign key (fornecedor) references fornecedores (id)
-    );
+create table if not exists produtos (
+	id int not null auto_increment primary key,
+	nome varchar(255) not null,
+	codigo_de_barras varchar(12) not null,
+	descricao varchar(255) not null,
+	preco float (11, 2) not null,
+	sku text not null,
+	quantidade int not null,
+	classificacao text not null,
+	fornecedor int not null,
+	codigoCor text not null,
+	imagem text not null,
+	filial text not null,
+	foreign key (fornecedor) references fornecedores (id)
+);
+
+insert into produtos (nome, codigo_de_barras, descricao, preco, sku, quantidade, classificacao, fornecedor, codigoCor, imagem, filial)
+		values ("Tinta personalizada", "111111111111", "Tinta personalizada", "89.90", "Qmx-tinta", "1", "Bases", "1", "QMX-01", "\uploads\1765287367039-proxy-image.jpg", "1");
  
 create table usuarios(
 	id int not null auto_increment primary key, 
@@ -303,39 +307,46 @@ create table controle_diario(
     foreign key (funcionario) references usuarios(id)
 );
 
-create table if not exists contas(
-id int primary key auto_increment not null,
-preco float(15, 2) not null,
-tipo varchar(100) not null,
-loja int not null,
-descricao text,
-vencimento date not null,
-estado enum("pago", "pendente", "vencido") not null
+CREATE TABLE contas(
+    id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    preco FLOAT(15, 2) NOT NULL,
+    tipo VARCHAR(100) NOT NULL,
+    loja INT NOT NULL,
+    descricao TEXT,
+    vencimento DATE NOT NULL,
+	estado ENUM('pago', 'pendente', 'vencido')
 );
 
-create table if not exists despesas(
-id int primary key auto_increment not null,
-loja int not null,
-receita float(30, 2) not null,
-despesas float(30, 2) not null,
-lucro float(30, 2) not null
+CREATE TABLE transferencias(
+    id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    loja INT NOT NULL,
+    produto INT NOT NULL,
+    quantidade_produto INT NOT NULL,
+    preco FLOAT(15, 2) NOT NULL,
+    troco FLOAT(15, 2),
+    operador_id INT,
+    horario DATETIME,
+    pagamento ENUM('Pix', 'Dinheiro', 'Débito', 'Crédito', 'Boleto'),
+    cart_id VARCHAR(255),
+    FOREIGN KEY (loja) REFERENCES lojas(id),
+    FOREIGN KEY (produto) REFERENCES produtos(id),
+    FOREIGN KEY (operador_id) REFERENCES usuarios(id)
 );
 
-create table if not exists transferencias(
-id int primary key auto_increment not null,
-loja int not null,
-produto int not null,
-quantidade_produto int not null,
-preco float(15, 2) not null,
-troco float(15, 2),
-foreign key (loja) references lojas(id),
-foreign key (produto) references produtos(id)
+CREATE TABLE despesas(
+    checkid INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    loja INT NOT NULL,
+    valor FLOAT(15, 2) NOT NULL,
+    data DATE NOT NULL,
+    descricao TEXT NOT NULL,
+    tipo ENUM('entrada', 'saida') NOT NULL
 );
 
 CREATE TABLE chat (
-id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-de INT NOT NULL,              
-para INT NOT NULL,            
-conteudo TEXT NOT NULL,        
-horario DATETIME NOT NULL     
+	id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	de INT NOT NULL,              
+	para INT NOT NULL,            
+	conteudo TEXT NOT NULL,        
+	horario DATETIME NOT NULL     
 );
+

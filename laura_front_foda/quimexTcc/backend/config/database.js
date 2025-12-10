@@ -5,7 +5,7 @@ const pool = mysql.createPool({
     host: 'localhost',
     user: 'root',
     password: 'Sen@i123',
-    database: 'quimex', 
+    database: 'quimex',
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0
@@ -56,7 +56,7 @@ async function read_some(table, where) {
         }
 
         const [rows] = await connection.execute(sql);
-        return rows|| null;
+        return rows || null;
     } finally {
         connection.release();
     }
@@ -139,4 +139,15 @@ async function arthur(arthur) {
     return arthur
 }
 
-export { create, readAll, read, update, deleteRecord, compare, lucas, arthur };
+async function describe(table) {
+    const connection = await getConnection();
+    try {
+        const sql = `DESCRIBE produtos`;
+        const [result] = await connection.execute(sql);
+        return result.affectedRows;
+    } finally {
+        connection.release();
+    }
+}
+
+export { create, readAll, read, update, deleteRecord, compare, lucas, arthur, describe };
