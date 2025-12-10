@@ -1,0 +1,83 @@
+[
+    {
+      "id": 1763140543020,
+      "companyName": "Avon",
+      "cnpj": "44.444.444/4444-44",
+      "email": "avonempresa@gmail.com",
+      "phone": "(11) 98374-6246",
+      "segment": "Farmacêutica e Cosmética",
+      "logo": "/parcerias/1763140543005-avon.png"
+    },
+    {
+      "id": 1763140737883,
+      "companyName": "L'Oréal",
+      "cnpj": "23.875.478/5276-06",
+      "email": "lorealparis@yahoo.com.br",
+      "phone": "(11) 92398-5723",
+      "segment": "Farmacêutica e Cosmética",
+      "logo": "/parcerias/1763140737871-loreal.png"
+    },
+    {
+      "id": 1763140893332,
+      "companyName": "Unilever",
+      "cnpj": "19.763.594/2670-29",
+      "email": "unilever.oficial@gmail.com",
+      "phone": "(11) 93753-4847",
+      "segment": "Limpeza e Saneamento",
+      "logo": "/parcerias/1763140893321-Unilever.png"
+    },
+    {
+      "id": 1763141179657,
+      "companyName": "Ypê",
+      "cnpj": "23.756.926/0375-54",
+      "email": "ypeempresas@gmail.com",
+      "phone": "(11) 4283-4950",
+      "segment": "Limpeza e Saneamento",
+      "logo": "/parcerias/1763141179644-ype.png"
+    },
+    {
+      "id": 1763143088762,
+      "companyName": "Tigre",
+      "cnpj": "10.325.792/3487-63",
+      "email": "tigretigresa@gmail.com",
+      "phone": "(11) 4785-9024",
+      "segment": "Indústria e Transformação",
+      "logo": "/parcerias/1763143088751-Tigre.png"
+    },
+    {
+      "id": 1763143240311,
+      "companyName": "Sherwin Williams",
+      "cnpj": "76.987.979/6754-67",
+      "email": "sherwin.williams@yahoo.com.br",
+      "phone": "(11) 93848-9998",
+      "segment": "Indústria e Transformação",
+      "logo": "/parcerias/1763143240302-Sherwin Williams.png"
+    },
+    {
+      "id": 1763143591098,
+      "companyName": "Hypera Pharma",
+      "cnpj": "73.747.492/9275-92",
+      "email": "hypera.pharma@yahoo.com.br",
+      "phone": "(11) 98374-8982",
+      "segment": "Farmacêutica e Cosmética",
+      "logo": "/parcerias/Logotipo_da_Hypera_Pharma.png"
+    },
+    {
+      "id": 1763144444878,
+      "companyName": "SABESP",
+      "cnpj": "84.377.295/9503-88",
+      "email": "sabesp.empresa@gmail.com",
+      "phone": "(11) 4384-5966",
+      "segment": "Limpeza e Saneamento",
+      "logo": "/parcerias/1763144444866-sabesp.png"
+    },
+    {
+        "id": 1763147844890,
+        "companyName": "Innova",
+        "cnpj": "41.773.795/9503-88",
+        "email": "comunicacao@innova.com.br",
+        "phone": "(11) 4384-5966",
+        "segment": "Limpeza e Saneamento",
+        "logo": "/parcerias/1453900135430-logo-innova.png"
+      }
+  ]

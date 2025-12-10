@@ -57,8 +57,8 @@ insert into fornecedores ( nome,
     setor,
     loja_vinculada)
     values 
-    ("Quimex", "Arthur Y.", "Diademe - SP", "11954590773", "quimex@gmail.com", "099999999900", "tintas", "1"),
-    ("Petrobras", "Janilson", "Ola - SP", "11965926890", "petrobras@gmail.com", "090412103456", "Bunda", "1");
+    ("Quimex", "Arthur Y.", "Diadema - SP", "11954590773", "quimex@gmail.com", "099999999900", "tintas", "1"),
+    ("Petrobras", "Janilson", "Pindamonhangaba - SP", "11965926890", "petrobras@gmail.com", "090412103456", "Quimicos", "1");
 		   
            
 create table if not exists produtos_quimicos (
